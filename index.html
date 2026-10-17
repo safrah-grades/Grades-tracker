@@ -3,7 +3,7 @@
 <title>سجل متابعة درجات الطلاب</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Layout: school paper sheet like the executive-plan tracker — letterhead, teal title band, orange summary box, pill tabs, bordered cards with tables */
 :root{
@@ -228,6 +228,97 @@ table.stf td{vertical-align:middle}table.stf select{border-color:var(--line);fon
   .foot{flex-direction:column;gap:8px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ===== Professional theme: calm palette, hairline borders, segmented navigation ===== */
+:root{
+  --bg:#eef2f5;--paper:#ffffff;--ink:#16212c;--muted:#5d6a78;--line:#e2e7ed;--line2:#d4dbe3;--soft:#f7f9fb;
+  --teal:#0f7a83;--teal-d:#0b5560;--teal-l:#edf6f7;--navy:#123a52;
+  --orange:#c9772e;--orange-d:#9a5518;--orange-l:#fbf4ec;--yellow:#e3b341;--yellow-l:#fbf7ea;
+  --pink:#c04d6e;--pink-l:#fbf0f3;--blue:#3d6fd6;--blue-l:#eef3fd;
+  --ok:#23925a;--ok-l:#e8f5ee;--prog:#b8860b;--prog-l:#fdf5df;--no:#c94242;--no-l:#fcecec;
+  --l1:#23925a;--l2:#0f7a83;--l3:#3d6fd6;--l4:#b8860b;--l5:#c94242;
+  --f:'IBM Plex Sans Arabic','Cairo','Segoe UI',Tahoma,Arial,sans-serif;--fh:'Cairo','IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  --sh1:0 1px 2px rgba(16,24,40,.05);--sh2:0 1px 3px rgba(16,24,40,.06),0 10px 28px rgba(16,24,40,.07);
+}
+body{font-size:14px;letter-spacing:0}
+h1,h2,h3,.tab,.btn,.kpi b,.title small{font-family:var(--fh)}
+.page{border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh2);padding:18px clamp(14px,2.6vw,28px) 20px}
+.hdr img{height:58px}
+.top{gap:14px;margin-top:10px}
+.title{background:linear-gradient(120deg,var(--navy) 0%,var(--teal) 100%);border-radius:14px;padding:14px 20px;text-align:start;align-items:flex-start;box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
+.title h1{font-size:clamp(20px,2.4vw,26px);letter-spacing:-.2px}
+.title small{color:#cfe6ea;font-weight:600;font-size:13.5px;margin-top:2px}
+.sum{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:12px 16px;box-shadow:var(--sh1)}
+.sum .lbl{color:var(--muted);font-weight:600;font-size:13px}.sum .lbl b{font-size:16px;font-family:var(--fh)}
+.bar{height:8px;border:0;background:#e9eef2;border-radius:99px}
+.meta{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:8px 14px;color:var(--muted);font-weight:600;align-items:center}
+.meta b{color:var(--ink)}
+.clsl select{border:1px solid var(--line2);border-radius:9px;font-size:14px;padding:4px 10px;background:#fff;color:var(--ink);font-family:var(--fh)}
+.meta .role{border:1px solid var(--line2);color:var(--teal-d);font-size:12.5px}
+.tabs{background:#eef2f5;border:1px solid var(--line);border-radius:12px;padding:4px;gap:2px;margin-top:12px;position:sticky}
+.tab{border:0;background:transparent;color:var(--muted);border-radius:9px;padding:7px 14px;font-size:14px;font-weight:700;transition:background .15s,color .15s}
+.tab:hover{color:var(--ink);background:rgba(255,255,255,.6)}
+.tab[aria-selected="true"]{background:#fff;color:var(--teal-d);box-shadow:0 1px 2px rgba(16,24,40,.08),0 0 0 1px var(--line)}
+.mtabs{background:#eef2f5;border:1px solid var(--line);border-radius:12px;padding:4px;gap:2px;margin-top:10px}
+.mtabs .tab,.mtabs .tab.alt{border:0;color:var(--muted)}.mtabs .tab[aria-selected="true"]{background:#fff;color:var(--teal-d)}
+.tools{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 12px;color:var(--ink);font-weight:600;box-shadow:var(--sh1)}
+.subbar{background:var(--paper);border:1px solid var(--line);border-radius:12px;color:var(--ink);font-weight:600;box-shadow:var(--sh1)}
+.subbar select{border:1px solid var(--line2);border-radius:9px;font-size:15px;font-family:var(--fh)}
+select,input[type=search],input[type=text],input[type=number],input[type=password],input[type=email],textarea{border:1px solid var(--line2);border-radius:9px;padding:5px 10px;font-family:var(--f);transition:border-color .15s,box-shadow .15s}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,122,131,.15)}
+.btn{border-radius:9px;padding:7px 16px;font-size:13.5px;font-weight:700;background:var(--teal);box-shadow:0 1px 2px rgba(16,24,40,.12);transition:background .15s,transform .05s}
+.btn:active{transform:translateY(1px)}
+.btn.o{background:var(--navy)}.btn.o:hover{background:#0c2b3e}
+.btn.w{background:#fff;color:var(--ink);border:1px solid var(--line2);box-shadow:var(--sh1)}.btn.w:hover{background:var(--soft)}
+.btn.r{border:1px solid #efc6c6;background:#fff;color:var(--no);box-shadow:none}.btn.r.sure{background:var(--no);color:#fff;border-color:var(--no)}
+.btn.sm{padding:4px 11px;font-size:12.5px}
+h2.sec{font-size:16px;color:var(--ink);margin:20px 0 8px;font-weight:800}
+h2.sec small{color:var(--muted);font-weight:500}
+.kpis{gap:12px;margin-top:14px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 16px;box-shadow:var(--sh1);position:relative}
+.kpi::before{content:"";position:absolute;inset-inline-start:16px;top:14px;width:8px;height:8px;border-radius:50%;background:var(--kc)}
+.kpi span{padding-inline-start:16px;order:-1;font-weight:600;font-size:12.5px}
+.kpi b{font-size:28px;font-weight:800;letter-spacing:-.5px}
+.cards{gap:14px;margin-top:14px}
+.card,.card.o{border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh1)}
+.ch,.card.o .ch{background:var(--soft);border-bottom:1px solid var(--line);padding:10px 16px}
+.ch h3,.card.o .ch h3{color:var(--ink);font-size:15px;font-weight:800}
+.ch small{font-weight:500}
+.cb{padding:12px 16px}
+th{background:var(--soft);color:#3b4856;font-weight:700;font-size:12.5px;border-bottom:1px solid var(--line2)}
+td{border-bottom:1px solid #edf1f4}
+tbody tr:nth-child(even) td{background:#fcfdfe}
+.hm td.nm,table.eg td.nm,table.att td.nm{background:var(--paper)}
+.lv{border-radius:6px;padding:1px 9px;font-weight:700;font-size:11.5px}
+.cell{border:1px solid var(--line2);border-radius:7px;width:44px;height:30px}
+.cell.full{background:var(--ok-l);border-color:#b9dfc9}
+.pm{border-radius:7px;background:var(--soft);color:var(--teal-d);border:1px solid var(--line)}
+.pm[data-d="-1"]{background:var(--soft);color:var(--no)}
+td.gt{background:var(--soft);color:var(--teal-d)}
+.note{border:1px solid var(--line);border-radius:12px;background:var(--soft)}
+.note.warn{border-color:#f0d3da;background:var(--pink-l)}
+.pcard{border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh1);padding:14px 18px}
+.pcard h2{color:var(--ink);font-size:21px}
+.ring{border:1px solid var(--line);background:var(--paper);border-radius:14px;box-shadow:var(--sh1)}
+.attl{border:1px solid #cfdcf6;background:var(--blue-l);border-radius:10px}
+.npre{border:1px solid #efe3bf;background:var(--yellow-l);border-radius:12px}
+.drop{border:1.5px dashed var(--line2);background:var(--soft);color:var(--ink);border-radius:12px}
+.addst{border:1px solid var(--line);background:var(--soft);border-radius:12px;color:var(--ink)}
+.savebar{border:1px solid #cfe6d9;background:#f2faf5;border-radius:12px;box-shadow:var(--sh1)}
+.lockbox{border:1px solid var(--line);background:var(--paper);box-shadow:var(--sh2);border-radius:18px}
+.opt{border:1px solid var(--line);border-radius:10px}.opt:has(input:checked){border-color:#a9d3d7;background:var(--teal-l)}
+.tag{border:1px solid #bcdde0;background:var(--teal-l);font-weight:700}
+.msel>summary{border:1px dashed var(--line2);color:var(--ink)}.msel[open]>summary{border-color:var(--teal)}
+.mlist{border:1px solid var(--line2);box-shadow:var(--sh2)}
+.chip{border-width:1.5px}
+.ab{border-radius:7px;border-width:1.5px}
+.foot{border-top:1px solid var(--line);padding-top:12px;margin-top:20px;color:var(--muted);font-weight:600;font-size:13px}
+.foot span:first-child{color:var(--teal-d);font-weight:700}
+.toast{background:var(--navy);border-radius:10px;font-weight:600}
+#egWrap{border-color:var(--line)!important}
+table.eg thead th.nm,table.att thead th.nm{background:var(--soft)!important}
+.att th.dh button[data-attday]{color:var(--ink)}
+@media (max-width:680px){.page{border-radius:14px;padding:12px}.title{padding:12px 14px}.kpi b{font-size:24px}}
 </style>
 
 <div class="page" dir="rtl" lang="ar">
