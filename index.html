@@ -324,6 +324,28 @@ td.gt{background:var(--soft);color:var(--teal-d)}
 table.eg thead th.nm,table.att thead th.nm{background:var(--soft)!important}
 .att th.dh button[data-attday]{color:var(--ink)}
 @media (max-width:680px){.page{border-radius:14px;padding:12px}.title{padding:12px 14px}.kpi b{font-size:24px}}
+
+/* ===== side menu (opens from the right) ===== */
+.navbar{display:flex;align-items:center;gap:12px;margin-top:12px;padding:6px 8px;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh1)}
+.hamb{flex:none;width:42px;height:42px;border-radius:10px;border:1px solid var(--line2);background:#fff;display:grid;place-content:center;gap:5px;cursor:pointer;padding:0}
+.hamb span{display:block;width:20px;height:2.4px;border-radius:2px;background:var(--navy)}
+.hamb:hover{background:var(--soft)}
+.curpage{font-family:var(--fh);font-weight:800;font-size:17px;color:var(--ink)}
+.drawer-ov{position:fixed;inset:0;background:rgba(16,24,40,.38);z-index:70;animation:fadeIn .18s ease}
+.drawer{position:fixed;top:0;bottom:0;right:0;width:min(300px,86vw);background:var(--paper);z-index:71;box-shadow:-12px 0 32px rgba(16,24,40,.18);transform:translateX(105%);transition:transform .22s ease;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 14px) max(14px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 14px) 14px;visibility:hidden}
+.drawer.open{transform:none;visibility:visible}
+.dhd{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 12px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.dhd b{font-family:var(--fh);font-size:17px;color:var(--navy)}
+.dx{border:0;background:var(--soft);width:34px;height:34px;border-radius:9px;font-size:15px;cursor:pointer;color:var(--muted)}
+.drawer .tabs{display:flex;flex-direction:column;gap:4px;position:static;background:none;border:0;padding:0;margin:0;overflow:visible}
+.drawer .tab{width:100%;text-align:start;padding:12px 14px;font-size:15.5px;border-radius:10px;color:var(--ink);background:transparent}
+.drawer .tab:hover{background:var(--soft)}
+.drawer .tab[aria-selected="true"]{background:var(--teal-l);color:var(--teal-d);box-shadow:inset -3px 0 0 var(--teal)}
+.dft{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.7}
+body.noscroll{overflow:hidden}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media (pointer:fine){.navbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:6}}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}.drawer-ov{animation:none}}
 </style>
 
 <div class="page" dir="rtl" lang="ar">
@@ -339,6 +361,9 @@ table.eg thead th.nm,table.att thead th.nm{background:var(--soft)!important}
   </div>
   <div class="meta" id="meta"></div>
 
+  <div class="navbar"><button class="hamb" id="menuBtn" type="button" aria-label="فتح قائمة الصفحات" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button><div class="curpage" id="curPage">📊 لوحة المتابعة</div></div>
+  <div class="drawer-ov" id="drawerOv" hidden></div>
+  <nav class="drawer" id="drawer" aria-label="صفحات السجل"><div class="dhd"><b>صفحات السجل</b><button class="dx" id="drawerX" type="button" aria-label="إغلاق القائمة">✕</button></div>
   <div class="tabs" role="tablist" id="tabs">
     <button class="tab" role="tab" data-t="dash" aria-selected="true">📊 لوحة المتابعة</button>
     <button class="tab" role="tab" data-t="entry" aria-selected="false">✏️ رصد الدرجات</button>
@@ -347,6 +372,7 @@ table.eg thead th.nm,table.att thead th.nm{background:var(--soft)!important}
     <button class="tab" role="tab" data-t="studs" aria-selected="false">👥 الطلاب</button>
     <button class="tab" role="tab" data-t="set" aria-selected="false">⚙️ الإعدادات</button>
   </div>
+  <div class="dft">سجل متابعة درجات الطلاب<br>إعداد وتصميم: أ. خالد الحمري</div></nav>
 
   <div class="subbar" id="scopeBar"></div>
   <div class="tools">
@@ -792,7 +818,8 @@ function renderScopeBar(){
 }
 /* ---------- views ---------- */
 function render(){
-  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===tab));
+  document.querySelectorAll('#tabs .tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===tab));
+  {const cb=document.querySelector('#tabs .tab[data-t="'+tab+'"]');if(cb)$('#curPage').textContent=cb.textContent}
   Object.values(charts).forEach(c=>c.destroy());for(const k in charts)delete charts[k];
   renderHeader();renderScopeBar();
   const v=$('#view');
@@ -885,6 +912,9 @@ document.addEventListener('keydown',e=>{
   }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='setPin'){e.preventDefault();settingsClick('setGo')}if(e.key==='Enter'&&e.target.id==='unPw'){e.preventDefault();settingsClick('unGo')}if(e.key==='Enter'&&(e.target.id==='newName'||e.target.id==='newPid')){e.preventDefault();const b=$('#sAdd');if(b)b.click()}if(e.key==='Enter'&&(e.target.id==='stName'||e.target.id==='stMail')){e.preventDefault();const b=$('#stAdd');if(b)b.click()}});
+function openDrawer(o){const d=$('#drawer'),ov=$('#drawerOv'),b=$('#menuBtn');d.classList.toggle('open',o);ov.hidden=!o;b.setAttribute('aria-expanded',o);document.body.classList.toggle('noscroll',o);if(o){const s=d.querySelector('.tab[aria-selected="true"]')||d.querySelector('.tab');if(s)s.focus()}else b.focus()}
+document.addEventListener('click',e=>{if(e.target.id==='drawerOv')openDrawer(false)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#drawer').classList.contains('open'))openDrawer(false)});
 document.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('cell'))e.target.select()});
 
 /* ---------- profile ---------- */
@@ -1617,6 +1647,9 @@ document.addEventListener('click',e=>{
   if(t.dataset.unsub){const [id,k]=t.dataset.unsub.split('|');const st=S.staff.find(x=>x.id===id);if(st){st.subj=st.subj.filter(x=>x!==k);saveStaff();if(st.uid)syncStaffAssign(st,st.uid).then(render);else render()}return}
   if(t.dataset.sdel){if(staffDelArm===t.dataset.sdel){const st=S.staff.find(x=>x.id===staffDelArm);S.staff=S.staff.filter(x=>x.id!==staffDelArm);staffDelArm=null;saveStaff();(async()=>{if(st&&st.uid)await syncStaffAssign(Object.assign({},st,{uid:''}),st.uid);render();toast('حُذف المعلم من القائمة')})()}else{staffDelArm=t.dataset.sdel;render()}return}
   if(t.dataset.copy){const v=t.dataset.copy;try{navigator.clipboard.writeText(v).then(()=>toast('نُسخ البريد: '+v),()=>toast(v))}catch(e){toast(v)}return}
+  if(t.id==='menuBtn'){openDrawer(true);return}
+  if(t.id==='drawerX'){openDrawer(false);return}
+  if(t.classList.contains('tab')&&t.closest('#drawer'))openDrawer(false);
   if(t.classList.contains('tab')){if(t.dataset.t!=='set')setOpen=false;tab=t.dataset.t;delArm=null;clrArm=false;render();return}
   if(t.classList.contains('pm')){const inp=t.parentElement.querySelector('input.cell');const max=+inp.dataset.max;const raw=normDigits(inp.value);let n=raw===''||isNaN(Number(raw))?null:Number(raw);
     const st=+S.info.step||1;
