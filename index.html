@@ -529,18 +529,20 @@ const GHK='grades-gh';
 let gh=(()=>{try{return JSON.parse(localStorage.getItem(GHK))||{}}catch(e){return{}}})();
 let ghSha=null,ghBusy=false,ghTimer=0,ghDirty=new Set(),ghLast='',ghErr='';
 const ghReady=()=>!!(gh.owner&&gh.repo&&gh.token);
-const ghUrl=()=>`https://api.github.com/repos/${encodeURIComponent(gh.owner)}/${encodeURIComponent(gh.repo)}/contents/${(gh.path||'data.json').split('/').map(encodeURIComponent).join('/')}`;
+gh.path='data.json';delete gh.branch;
+const ghRepoUrl=()=>`https://api.github.com/repos/${encodeURIComponent(gh.owner)}/${encodeURIComponent(gh.repo)}`;
+const ghUrl=()=>ghRepoUrl()+'/contents/data.json';
 const ghHead=()=>({Authorization:'Bearer '+gh.token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'});
 const b64e=str=>{const u=new TextEncoder().encode(str);let t='';for(let i=0;i<u.length;i+=8192)t+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(t)};
 const b64d=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g,'')),c=>c.charCodeAt(0)));
 function ghStatus(t,err){ghErr=err?t:'';ghLast=err?ghLast:t;const e=$('#ghMsg');if(e){e.textContent=t;e.classList.toggle('err',!!err)}if(!err)setSave(t)}
 async function ghGet(){
-  const r=await fetch(ghUrl()+'?ref='+encodeURIComponent(gh.branch||'main'),{headers:ghHead(),cache:'no-store'});
-  if(r.status===404)return{data:null,sha:null};
+  const r=await fetch(ghUrl(),{headers:ghHead(),cache:'no-store'});
+  if(r.status===404){const rr=await fetch(ghRepoUrl(),{headers:ghHead(),cache:'no-store'});if(!rr.ok)throw new Error(rr.status===401?'المفتاح (Token) غير صحيح أو منتهي':'لم أجد المستودع «'+gh.owner+'/'+gh.repo+'» أو المفتاح لا يشمله');return{data:null,sha:null}}
   if(!r.ok)throw new Error(r.status===401?'المفتاح (Token) غير صحيح أو منتهي':r.status===403?'المفتاح لا يملك صلاحية هذا المستودع':'خطأ من GitHub ('+r.status+')');
   const j=await r.json();let txt;
   if(j.content)txt=b64d(j.content);
-  else{const raw=await fetch(ghUrl()+'?ref='+encodeURIComponent(gh.branch||'main'),{headers:Object.assign(ghHead(),{Accept:'application/vnd.github.raw+json'}),cache:'no-store'});txt=await raw.text()}
+  else{const raw=await fetch(ghUrl(),{headers:Object.assign(ghHead(),{Accept:'application/vnd.github.raw+json'}),cache:'no-store'});txt=await raw.text()}
   return{data:JSON.parse(txt||'{}'),sha:j.sha};
 }
 function localAll(){
@@ -572,9 +574,9 @@ async function ghPush(){
       out.info=mine.info;out.staff=mine.staff;
       dirty.forEach(c=>{if(c!=='g'&&mine.classes[c])out.classes[c]=mine.classes[c]});
       out.at=new Date().toISOString();
-      const r=await fetch(ghUrl(),{method:'PUT',headers:Object.assign(ghHead(),{'Content-Type':'application/json'}),body:JSON.stringify({message:'تحديث سجل الدرجات — '+clsName()+' — '+out.at,content:b64e(JSON.stringify(out,null,1)),sha:sha||undefined,branch:gh.branch||'main'})});
+      const r=await fetch(ghUrl(),{method:'PUT',headers:Object.assign(ghHead(),{'Content-Type':'application/json'}),body:JSON.stringify({message:'تحديث سجل الدرجات — '+clsName()+' — '+out.at,content:b64e(JSON.stringify(out,null,1)),sha:sha||undefined})});
       if(r.ok){const j=await r.json();ghSha=j.content&&j.content.sha;ghStatus('☁️ رُفع إلى GitHub '+new Date().toLocaleTimeString('ar-BH',{hour:'2-digit',minute:'2-digit'}));ghBusy=false;return true}
-      if(r.status!==409&&r.status!==422)throw new Error(r.status===401?'المفتاح غير صحيح':r.status===403||r.status===404?'المفتاح لا يملك صلاحية الكتابة في المستودع':'خطأ '+r.status);
+      if(r.status!==409&&r.status!==422)throw new Error(r.status===401?'المفتاح غير صحيح أو منتهي':r.status===403||r.status===404?'المفتاح لا يملك صلاحية الكتابة (اختر Contents: Read and write عند إنشاء المفتاح)':'خطأ '+r.status);
     }
     throw new Error('تعارض متكرر، حاول مرة أخرى');
   }catch(e){dirty.forEach(c=>ghDirty.add(c));ghBusy=false;ghStatus('تعذّر الرفع إلى GitHub: '+(e.message||''),true);return false}
@@ -583,10 +585,7 @@ async function ghPush(){
 setInterval(async()=>{if(mode!=='local'||!ghReady()||document.hidden||ghDirty.size||ghBusy)return;const ch=await ghPull(true);if(ch){const a=document.activeElement;if(a&&a.closest&&a.closest('input,textarea,select,table.eg,table.att'))return;openClass(curCls)}},60000);
 function ghCard(){
   return `<div class="set">
-    <label>صاحب المستودع<input type="text" id="ghOwner" value="${esc(gh.owner||'khaledalhamri93-stack')}" autocomplete="off"></label>
-    <label>مستودع البيانات (خاص)<input type="text" id="ghRepo" value="${esc(gh.repo||'grades-data')}" autocomplete="off"></label>
-    <label>اسم الملف<input type="text" id="ghPath" value="${esc(gh.path||'data.json')}" autocomplete="off"></label>
-    <label>الفرع<input type="text" id="ghBranch" value="${esc(gh.branch||'main')}" autocomplete="off"></label>
+    <label>مستودع البيانات (خاص)<input type="text" id="ghRepo" dir="ltr" value="${esc((gh.owner||'khaledalhamri93-stack')+'/'+(gh.repo||'Grades-data'))}" autocomplete="off" autocapitalize="off" spellcheck="false"><small style="color:var(--muted);font-weight:600">اتركه كما هو: khaledalhamri93-stack/Grades-data</small></label>
     <label style="grid-column:1/-1">مفتاح الوصول (Fine-grained Token بصلاحية Contents: Read and write)<input type="password" id="ghToken" value="" placeholder="${gh.token?'محفوظ على هذا الجهاز — اتركه فارغًا للإبقاء عليه':'github_pat_…'}" autocomplete="off"></label></div>
   <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
     <button class="btn" id="ghSave" type="button">🔗 حفظ الربط واختباره</button>
@@ -598,14 +597,18 @@ function ghCard(){
 }
 async function ghClick(id){
   if(id==='ghSave'){
-    const tk=($('#ghToken').value||'').trim();
-    gh={owner:($('#ghOwner').value||'').trim(),repo:($('#ghRepo').value||'').trim(),path:($('#ghPath').value||'data.json').trim(),branch:($('#ghBranch').value||'main').trim(),token:tk||gh.token||''};
+    const tk=($('#ghToken').value||'').replace(/\s+/g,'');
+    const rv=($('#ghRepo').value||'').trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\.git$/,'').replace(/\/+$/,'');
+    const pr=rv.split('/').filter(Boolean);
+    gh={owner:pr.length>1?pr[0]:'khaledalhamri93-stack',repo:pr.length>1?pr[1]:(pr[0]||'Grades-data'),path:'data.json',token:tk||gh.token||''};
     try{localStorage.setItem(GHK,JSON.stringify(gh))}catch(e){}
     if(!ghReady()){ghStatus('أكمل اسم المستودع والمفتاح',true);return true}
     ghStatus('جارٍ الاختبار…');ghSha=null;
     try{const {data,sha}=await ghGet();ghSha=sha;
       if(data&&data.app==='grades'){applyRemote(data);openClass(curCls);toast('🔗 رُبط وحُمّلت البيانات من GitHub');ghStatus('🔗 مربوط — حُمّلت البيانات')}
-      else{CLASSES.forEach(c=>ghDirty.add(c.id));ghDirty.add('g');await ghPush();toast('🔗 رُبط ورُفعت بياناتك إلى GitHub');render()}
+      else{const has=CLASSES.some(c=>{try{return (JSON.parse(localStorage.getItem(LKEY+'-'+c.id)||'{}').roster||[]).length}catch(e){return false}});
+        if(has){CLASSES.forEach(c=>ghDirty.add(c.id));ghDirty.add('g');await ghPush();toast('🔗 رُبط ورُفعت بياناتك إلى GitHub');render()}
+        else ghStatus('🔗 مربوط، لكن ملف البيانات غير موجود في المستودع بعد',true)}
     }catch(e){ghStatus('تعذّر الاتصال: '+(e.message||''),true)}
     return true}
   if(id==='ghPullB'){ghSha=null;ghDirty.clear();const ch=await ghPull();openClass(curCls);toast(ch?'⬇ حُمّلت آخر نسخة من GitHub':'لا توجد تغييرات جديدة');return true}
