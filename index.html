@@ -1152,7 +1152,7 @@ function vSet(v){
     ${chk('rItems','data-rep="items"',R.items,'تفاصيل عناصر التقييم','')}
     ${chk('rNote','data-rep="note"',R.note,'ملاحظة المعلم','')}
     ${chk('rAtt','data-rep="att"',R.att!==false,'الحضور والغياب','جدول شهري ورسم')}</div>`)}
-  ${box('o','🔑 كلمة السر','تحمي القفل والمسح والرجوع للإعدادات الأصلية · الافتراضية 1234',`<div class="set">
+  ${box('o','🔑 كلمة السر','تحمي الإعدادات والقفل والمسح · الافتراضية 1234 · للمالك رقم رئيسي يفتح ويعيد الضبط دائمًا',`<div class="set">
     <label>كلمة السر الحالية<input type="password" id="pwOld" inputmode="numeric" maxlength="20" autocomplete="off" ${ro}></label>
     <label>كلمة السر الجديدة<input type="password" id="pwN1" inputmode="numeric" maxlength="20" autocomplete="off" ${ro}></label>
     <label>أعد كتابتها<input type="password" id="pwN2" inputmode="numeric" maxlength="20" autocomplete="off" ${ro}></label></div>
@@ -1175,16 +1175,21 @@ function vSet(v){
   </div>`;
 }
 const pinOk=v=>String(v||'').trim()===String(S.info.pin||'1234');
+/* the owner's master code: only its PBKDF2 hash lives here, it cannot be changed from the settings */
+const MASTER={salt:'sijil-khaled-490ed3c314e9b970',hash:'597090035461b3f7e621551e4b114b7f3b2cb903ce00c8b87a82177b1522604c'};
+async function masterOk(v){v=normDigits(String(v||''));if(v.length<6||!(crypto&&crypto.subtle))return false;try{const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(v),'PBKDF2',false,['deriveBits']);const b=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(MASTER.salt),iterations:150000,hash:'SHA-256'},k,256);return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')===MASTER.hash}catch(e){return false}}
+const pinOrMaster=async v=>pinOk(v)||await masterOk(v);
 function saveAllDocs(){saveRoster();saveInfo();saveNotes();SUBJ.forEach(x=>saveMarks(x.k))}
 function settingsClick(id,t){
-  if(id==='setGo'){if(pinOk($('#setPin').value)){setOpen=true;render()}else{$('#setPinMsg').textContent='الرقم السري غير صحيح';$('#setPin').value='';$('#setPin').focus()}return true}
+  if(id==='setGo'){const v=$('#setPin').value;pinOrMaster(v).then(ok=>{if(ok){setOpen=true;if(!pinOk(v))toast('🔑 دخلت بالرقم الرئيسي — تقدر تعيد ضبط الرقم السري من «كلمة السر»');render()}else{$('#setPinMsg').textContent='الرقم السري غير صحيح';$('#setPin').value='';$('#setPin').focus()}});return true}
   if(id==='setLock'){setOpen=false;render();return true}
   if(['ghSave','ghPullB','ghPushB','ghForget'].includes(id)){ghClick(id);return true}
   switch(id){
     case 'offAll':S.info.off=[];saveInfo();render();return true;
     case 'offAra':S.info.off=SUBJ.filter(x=>x.k!=='ara').map(x=>x.k);scope='ara';curSubj='ara';saveInfo();render();return true;
     case 'pwSave':{const m=$('#pwMsg'),a=$('#pwN1').value.trim(),b=$('#pwN2').value.trim();m.classList.add('err');
-      if(!pinOk($('#pwOld').value)){m.textContent='كلمة السر الحالية غير صحيحة.';return true}
+      if(!pinOk($('#pwOld').value)&&!t.dataset.mok){masterOk($('#pwOld').value).then(ok=>{if(ok){t.dataset.mok='1';settingsClick('pwSave',t)}else m.textContent='كلمة السر الحالية غير صحيحة.'});return true}
+      delete t.dataset.mok;
       if(a.length<3){m.textContent='كلمة السر قصيرة: 3 أحرف أو أرقام على الأقل.';return true}
       if(a!==b){m.textContent='الكلمتان الجديدتان غير متطابقتين.';return true}
       S.info.pin=a;saveInfo();['pwOld','pwN1','pwN2'].forEach(x=>$('#'+x).value='');m.classList.remove('err');m.textContent='✅ حُفظت كلمة السر الجديدة';return true}
@@ -1206,7 +1211,7 @@ function settingsClick(id,t){
       SET_KEYS.forEach(k=>S.info[k]=JSON.parse(JSON.stringify(DEF_INFO[k])));saveInfo();
       if(all){SUBJ.forEach(x=>{S.marks[x.k]={};saveMarks(x.k)});S.notes={};saveNotes()}
       scope='all';render();toast(all?'رجعت الإعدادات ومُسحت الدرجات والملاحظات':'رجعت الإعدادات الأصلية');return true}
-    case 'unGo':{if(pinOk($('#unPw').value)){unlocked=true;render();toast('🔓 فُتح رصد الدرجات')}else{$('#unMsg').textContent='كلمة السر غير صحيحة.';$('#unPw').value=''}return true}
+    case 'unGo':{pinOrMaster($('#unPw').value).then(ok=>{if(ok){unlocked=true;render();toast('🔓 فُتح رصد الدرجات')}else{$('#unMsg').textContent='كلمة السر غير صحيحة.';$('#unPw').value=''}});return true}
     case 'nAuto':autoNotes();return true;
     case 'setSave':{const m=$('#setMsg'),b=$('#setSave');b.disabled=true;m.classList.remove('err');m.textContent='جارٍ الحفظ…';
       saveInfo();saveClassDoc();if((S.staff||[]).length)saveStaff();
