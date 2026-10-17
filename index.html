@@ -360,6 +360,19 @@ body.gated{overflow:hidden}
 .gbox input{box-sizing:border-box;width:100%;min-width:0;font-size:22px;letter-spacing:.35em;text-align:center;padding:8px;border:1px solid var(--line2);border-radius:10px}
 .gbox .btn{justify-content:center;padding:10px;font-size:15.5px}
 .gbox small{color:var(--muted);margin-top:6px}
+/* in-app guide */
+.help{margin-top:14px}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}.hbtns a.btn{text-decoration:none}
+.hvid{margin-top:12px;background:#0b1f2d;border-radius:14px;overflow:hidden;box-shadow:var(--sh2)}.hvid video{display:block;width:100%;max-height:70vh;background:#0b1f2d}
+.hacc{display:grid;gap:8px;margin-top:14px}
+.hitem{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh1)}
+.hitem>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;font-family:var(--fh);font-size:15.5px}
+.hitem>summary::-webkit-details-marker{display:none}
+.hitem>summary::after{content:"▾";margin-inline-start:auto;color:var(--muted);transition:transform .2s}
+.hitem[open]>summary::after{transform:rotate(180deg)}
+.hitem .hn{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--teal);color:#fff;font-size:14px;flex:none}
+.hitem .hi{font-size:20px}
+.hitem ol{margin:0;padding:0 44px 14px 18px;line-height:1.9;color:#2b3947;font-size:14px}
 /* home + tidy inner pages */
 .page.inner .hdr,.page.inner .top{display:none}
 .navcls{margin-inline-start:auto;font-weight:700;font-size:13px;color:var(--teal-d);background:var(--teal-l);border-radius:999px;padding:4px 12px}
@@ -422,6 +435,7 @@ body.gated{overflow:hidden}
     <button class="tab" role="tab" data-t="prof" aria-selected="false">🧑‍🎓 ملف الطالب</button>
     <button class="tab" role="tab" data-t="studs" aria-selected="false">👥 الطلاب</button>
     <button class="tab" role="tab" data-t="set" aria-selected="false">⚙️ الإعدادات</button>
+    <button class="tab" role="tab" data-t="help" aria-selected="false">📘 دليل الاستخدام</button>
   </div>
   <div class="dft">سجل متابعة درجات الطلاب<br>إعداد وتصميم: أ. خالد الحمري</div></nav>
 
@@ -877,8 +891,8 @@ function render(){
   const v=$('#view');
   if(tab==='home'&&mode!=='loading'&&!(mode==='db'&&!rosterLoaded)){vHome(v);return}
   if(mode==='loading'||(mode==='db'&&!rosterLoaded)){v.innerHTML='<div class="empty">جارٍ تحميل السجل…</div>';return}
-  if(!S.roster.length&&tab!=='studs'&&tab!=='set'){v.innerHTML=`<div class="note warn" style="margin-top:14px">لا توجد أسماء طلاب في ${esc(clsName())} بعد. افتح تبويب <b>الطلاب</b> لإضافة الأسماء أو استيرادها من ملف Excel.</div>`;return}
-  ({home:vHome,dash:vDash,entry:vEntry,att:vAtt,prof:vProf,studs:vStuds,set:vSet})[tab](v);
+  if(!S.roster.length&&tab!=='studs'&&tab!=='set'&&tab!=='help'){v.innerHTML=`<div class="note warn" style="margin-top:14px">لا توجد أسماء طلاب في ${esc(clsName())} بعد. افتح تبويب <b>الطلاب</b> لإضافة الأسماء أو استيرادها من ملف Excel.</div>`;return}
+  ({home:vHome,help:vHelp,dash:vDash,entry:vEntry,att:vAtt,prof:vProf,studs:vStuds,set:vSet})[tab](v);
 }
 
 Chart.defaults.font.family="'Cairo','Segoe UI',Tahoma,sans-serif";Chart.defaults.color='#5d6b78';Chart.defaults.font.size=12;
@@ -906,6 +920,27 @@ function vHome(v){
    </div>
    ${mySubs.length?`<h3 class="hsec">${mode==='db'&&!canWrite?'موادي':'الدخول السريع لرصد مادة'}</h3><div class="qsubs">${mySubs.map(x=>{const p=classStats(x.k);return `<button type="button" class="qs c${x.ci}" data-nav="entry" data-sub="${x.k}"><b>${esc(x.n)}</b><small>${pctS(p.comp*100)} مرصود · متوسط ${pctS(p.avg)}</small></button>`}).join('')}</div>`:''}
   </section>`;
+}
+/* ---------- in-app user guide ---------- */
+const HELP=[
+ ['🏠','الدخول والصفحة الرئيسية',['افتح رابط المنصة واكتب كلمة المرور (تُطلب مرة واحدة في كل جلسة).','تظهر الصفحة الرئيسية: بطاقة الصف الحالي بأرقامه، ثم بطاقات «ماذا تريد أن تفعل؟».','اضغط أي بطاقة للدخول إليها، و«الدخول السريع» يفتح رصد المادة مباشرة.','ارجع من أي صفحة بزر «🏠 الرئيسية» أعلى الصفحة.']],
+ ['☰','التنقل واختيار الصف والمادة',['زر الخطوط الثلاثة أعلى اليمين يفتح قائمة كل الصفحات.','«🏫 الصف» ينقلك بين صفوف المدرسة؛ لكل صف طلابه ودرجاته وحضوره.','«📚 المادة»: «كل المواد» للإنجاز الكلي أو مادة واحدة لعرض لوحتها وتقاريرها.']],
+ ['✏️','رصد الدرجات',['اختر المادة، ثم استخدم + لرفع الدرجة و− لخفضها، أو اكتبها مباشرة.','اضغط Enter للانتقال إلى الطالب التالي، أو الأسهم ↑ ↓.','الخانة الحمراء = درجة أكبر من الحد الأعلى ولن تُحفظ. اترك الخانة فارغة إن لم يُقيَّم الطالب.','الحفظ تلقائي مع كل تعديل.']],
+ ['🗓️','الحضور والغياب',['اختر الشهر من التبويبات (سبتمبر – يناير).','اضغط رقم اليوم ليُسجَّل «حاضر» لكل من لم يُرصد، ثم عدّل الغائبين.','كل ضغطة على الخانة: حاضر ← غائب ← متأخر ← بعذر ← فارغ. وزر ⊘ تحت اليوم يجعله عطلة.']],
+ ['📊','لوحة المتابعة',['مؤشرات: متوسط الإنجاز، اكتمال الرصد، الممتازون، ومن يحتاجون دعمًا.','رسوم: توزيع المستويات، الإنجاز في كل مادة، وترتيب الطلاب (اضغط الاسم لفتح ملفه).','خريطة الإنجاز تكشف نقاط القوة والضعف لكل طالب في كل مادة.']],
+ ['🧑‍🎓','ملف الطالب والملاحظات',['اختر الطالب أو تنقّل بزرّي السابق والتالي.','ملاحظات ولي الأمر: ثلاث قوائم (الأداء، السلوك، التوصيات) ويمكن اختيار أكثر من ملاحظة في كل قائمة.','«ملء الملاحظات تلقائيًا» يقترح ملاحظات حسب مستوى كل طالب.']],
+ ['📄','التقارير',['«تقرير ولي الأمر PDF» في ملف الطالب يُخرج تقريره المصوّر.','«تقارير PDF لكل الطلاب» يُخرج ملفًا واحدًا لكل طلاب الصف.','«تصدير ملف Excel» يُخرج ملف السجل الرسمي معبأً بالدرجات.','اختر مادة من قائمة 📚 قبل التصدير لتقرير تلك المادة فقط.']],
+ ['👥','الطلاب',['أضف الطالب بالاسم الرباعي (والرقم الشخصي اختياريًا) ثم «إضافة».','عدّل الاسم في الجدول مباشرة، واحذف بالضغط على «حذف» مرتين للتأكيد.','استورد الأسماء من Excel (عمود «اسم الطالب»، و«الصف» لتوزيعها على كل الصفوف) أو الصقها.']],
+ ['⚙️','الإعدادات',['تُفتح بالرقم السري، وبعد التعديل اضغط «💾 حفظ الإعدادات» ثم «🔒 قفل».','المعلمون والمواد: لكل معلم مادة أو أكثر وصف أو أكثر، يدويًا أو من Excel.','بيانات السجل، المواد المعروضة، خيارات الرصد، حدود المستويات، ومحتوى تقرير ولي الأمر.']],
+ ['🔗','الحفظ والمزامنة والحماية',['الربط مع GitHub: الصق مفتاح الوصول مرة واحدة لكل جهاز ثم «حفظ الربط واختباره».','التعديلات تُرفع تلقائيًا بعد ثوانٍ، والصفحة تجلب تعديلات الزملاء كل دقيقة.','نزّل نسخة احتياطية قبل أي مسح، وغيّر كلمة السر الافتراضية، ولا تشارك مفتاح الوصول.']]];
+function vHelp(v){
+  v.innerHTML=`<section class="help">
+   <div class="hwel"><div><small>دليل الاستخدام</small><h2>كيف تستخدم سجل متابعة درجات الطلاب؟</h2><p>جولة مختصرة في كل صفحات المنصة — والدليل الكامل المصوّر بصيغة PDF.</p></div>
+    <div class="hbtns"><a class="btn" href="guide.pdf" target="_blank" rel="noopener">📄 فتح الدليل المصوّر PDF</a><a class="btn w" href="guide.pdf" download="دليل استخدام سجل متابعة درجات الطلاب.pdf">⬇ تنزيل الدليل</a></div></div>
+   <div class="hvid" id="hVid" hidden><video src="guide.mp4" controls preload="metadata" playsinline></video></div>
+   <div class="hacc">${HELP.map((h,i)=>`<details class="hitem"${i===0?' open':''}><summary><span class="hn">${i+1}</span><span class="hi">${h[0]}</span><b>${h[1]}</b></summary><ol>${h[2].map(x=>`<li>${x}</li>`).join('')}</ol></details>`).join('')}</div>
+   <p class="hint" style="text-align:center;margin-top:14px">إعداد وتصميم: أ. خالد الحمري</p></section>`;
+  const vd=v.querySelector('#hVid video');if(vd){vd.addEventListener('loadedmetadata',()=>{$('#hVid').hidden=false});vd.addEventListener('error',()=>{$('#hVid').hidden=true})}
 }
 function vDash(v){
   if(scope!=='all')return vDashSubj(v);
