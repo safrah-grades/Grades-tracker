@@ -363,7 +363,6 @@ body.gated{overflow:hidden}
 /* in-app guide */
 .help{margin-top:14px}
 .hbtns{display:flex;gap:8px;flex-wrap:wrap}.hbtns a.btn{text-decoration:none}
-.hvid{margin-top:12px;background:#0b1f2d;border-radius:14px;overflow:hidden;box-shadow:var(--sh2)}.hvid video{display:block;width:100%;max-height:70vh;background:#0b1f2d}
 .hacc{display:grid;gap:8px;margin-top:14px}
 .hitem{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh1)}
 .hitem>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;font-family:var(--fh);font-size:15.5px}
@@ -937,10 +936,8 @@ function vHelp(v){
   v.innerHTML=`<section class="help">
    <div class="hwel"><div><small>دليل الاستخدام</small><h2>كيف تستخدم سجل متابعة درجات الطلاب؟</h2><p>جولة مختصرة في كل صفحات المنصة — والدليل الكامل المصوّر بصيغة PDF.</p></div>
     <div class="hbtns"><a class="btn" href="guide.pdf" target="_blank" rel="noopener">📄 فتح الدليل المصوّر PDF</a><a class="btn w" href="guide.pdf" download="دليل استخدام سجل متابعة درجات الطلاب.pdf">⬇ تنزيل الدليل</a></div></div>
-   <div class="hvid" id="hVid" hidden><video src="guide.mp4" controls preload="metadata" playsinline></video></div>
    <div class="hacc">${HELP.map((h,i)=>`<details class="hitem"${i===0?' open':''}><summary><span class="hn">${i+1}</span><span class="hi">${h[0]}</span><b>${h[1]}</b></summary><ol>${h[2].map(x=>`<li>${x}</li>`).join('')}</ol></details>`).join('')}</div>
    <p class="hint" style="text-align:center;margin-top:14px">إعداد وتصميم: أ. خالد الحمري</p></section>`;
-  const vd=v.querySelector('#hVid video');if(vd){vd.addEventListener('loadedmetadata',()=>{$('#hVid').hidden=false});vd.addEventListener('error',()=>{$('#hVid').hidden=true})}
 }
 function vDash(v){
   if(scope!=='all')return vDashSubj(v);
