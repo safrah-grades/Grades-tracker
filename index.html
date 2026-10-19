@@ -1428,7 +1428,7 @@ function ctSelect(id,dis){
   const known=L.some(t=>t.id===S.ctId);
   const o=(t,here)=>`<option value="${t.id}"${t.id===S.ctId?' selected':''}>${esc(t.name)}${here?(ttSubjIn(t,curCls)?' — '+esc(ttSubjIn(t,curCls)):''):((t.cls||[]).length?' — '+esc((t.cls||[]).map(clsShort).join('، ')):'')}</option>`;
   const here=L.filter(t=>(t.cls||[]).includes(curCls)),rest=L.filter(t=>!(t.cls||[]).includes(curCls));
-  return `<select id="${id}" data-ctsel="1" ${dis?'disabled':''} aria-label="معلم الصف"><option value="">— اختر معلم الصف —</option>${!known&&S.ct?`<option value="__old" selected>${esc(S.ct)}</option>`:''}${here.length?`<optgroup label="معلمو ${esc(clsName())}">${here.map(t=>o(t,1)).join('')}</optgroup><optgroup label="بقية المعلمين">${rest.map(t=>o(t,0)).join('')}</optgroup>`:L.map(t=>o(t,0)).join('')}</select>`;
+  return `<select id="${id}" data-ctsel="1" ${dis?'disabled':''} aria-label="معلم الصف"><option value="">— اختر معلم الصف —</option>${!known&&S.ct?`<option value="__old" selected>${esc(S.ct)}</option>`:''}${L.map(t=>`<option value="${t.id}"${t.id===S.ctId?' selected':''}>${esc(t.name)}</option>`).join('')}</select>`;
 }
 function staffCard(ro){
   const L=S.staff||[];
