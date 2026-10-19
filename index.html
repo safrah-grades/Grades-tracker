@@ -367,6 +367,13 @@ body.gated{overflow:hidden}
 @media (max-width:560px){.attbar .btn{flex:1 1 100%;justify-content:center}.attbar label{flex:1 1 100%}.attbar select{flex:1}}
 /* teachers timetable */
 #ctSelH,#iCt{max-width:340px;text-overflow:ellipsis}
+.meta .mrow{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;flex:1 1 100%}
+.meta .minfo{font-size:13px;color:var(--muted);font-weight:600}.meta .minfo b{color:var(--ink)}
+#meSel{max-width:320px}
+.ccards{flex:1 1 100%;display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;padding:4px 2px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.ccard{flex:0 0 auto;min-width:140px;max-width:240px;display:grid;gap:2px;text-align:start;border:1px solid var(--line2);border-inline-start:4px solid var(--teal);border-radius:12px;background:#fff;padding:9px 12px;cursor:pointer;font:inherit;color:var(--ink);box-shadow:var(--sh1)}
+.ccard b{font-family:var(--fh);font-size:14px}.ccard small{color:var(--muted);font-weight:600;font-size:11.5px;white-space:normal;line-height:1.4}
+.ccard:hover{background:var(--teal-l)}.ccard.on{background:var(--teal);border-color:var(--teal);color:#fff}.ccard.on small{color:#d9f0f1}
 .ctcls{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:12.5px;color:var(--muted);font-weight:700}.ctcls .chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
 @media (max-width:560px){.ctcls{flex:1 1 100%}}
 .seg{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:4px}
@@ -900,7 +907,8 @@ function renderHeader(){
   $('#sumComp').textContent=pctS(c.comp*100);$('#barComp').style.width=(c.comp*100)+'%';
   const I=S.info;
   $('#subTitle').innerHTML=esc(clsName())+' · '+esc(scopeName())+' · '+esc(I.term||'')+' <span dir="ltr">'+esc(I.year||'')+'</span>';
-  $('#meta').innerHTML=`<label class="clsl">🏫 الصف: <select id="clsSel">${(()=>{const o=c=>`<option value="${c.id}"${c.id===curCls?' selected':''}>${esc(c.n)}</option>`;const mine=teacherClasses();return mine.length?`<optgroup label="✏️ صفوفي">${CLASSES.filter(c=>mine.includes(c.id)).map(o).join('')}</optgroup><optgroup label="باقي الصفوف (اطلاع)">${CLASSES.filter(c=>!mine.includes(c.id)).map(o).join('')}</optgroup>`:CLASSES.map(o).join('')})()}</select></label>${canWrite&&mode!=='loading'?`<label class="clsl">👨‍🏫 معلم الصف: ${ctSelect('ctSelH')}</label>${ctClassChips()}`:`<span>👨‍🏫 معلم الصف: <b>${esc(S.ct||'—')}</b></span>`}<span>👥 عدد الطلاب: <b>${S.roster.length}</b></span><span>📚 المواد: <b>${CNT().length}</b>${on('til')?' + التلاوة':''}</span><span class="role">${mode!=='db'?'':isOwner||canWrite?'':mySubjects().length?'👩‍🏫 '+esc((staffByUid(me)||{}).name||'معلم')+': '+mySubjects().map(x=>esc(x.n)).join('، ')+' — تعدّل مادتك فقط':'👁 عرض فقط — لم تُسند لك مادة بعد'}</span>`;
+  $('#meta').innerHTML=metaHTML();
+  {const a=document.querySelector('.ccard.on');if(a){const p=a.parentElement,ar=a.getBoundingClientRect(),pr=p.getBoundingClientRect();if(ar.left<pr.left||ar.right>pr.right)p.scrollLeft+=(ar.left+ar.width/2)-(pr.left+pr.width/2)}}
   document.querySelectorAll('.tab[data-t="studs"],.tab[data-t="set"]').forEach(b=>b.hidden=mode==='db'&&!canWrite);
   if(mode==='db'&&!canWrite&&(tab==='studs'||tab==='set'))tab='dash';
   $('#fPrin').textContent=I.principal||'';
@@ -962,7 +970,7 @@ function vHome(v){
 /* ---------- in-app user guide ---------- */
 const HELP=[
  ['🏠','الدخول والصفحة الرئيسية',['افتح رابط المنصة واكتب كلمة المرور (تُطلب مرة واحدة في كل جلسة).','تظهر الصفحة الرئيسية: بطاقة الصف الحالي بأرقامه، ثم بطاقات «ماذا تريد أن تفعل؟».','اضغط أي بطاقة للدخول إليها، و«الدخول السريع» يفتح رصد المادة مباشرة.','ارجع من أي صفحة بزر «🏠 الرئيسية» أعلى الصفحة.']],
- ['☰','التنقل واختيار الصف والمادة',['زر الخطوط الثلاثة أعلى اليمين يفتح قائمة كل الصفحات.','«🏫 الصف» ينقلك بين صفوف المدرسة؛ لكل صف طلابه ودرجاته وحضوره.','«📚 المادة»: «كل المواد» للإنجاز الكلي أو مادة واحدة لعرض لوحتها وتقاريرها.']],
+ ['☰','التنقل واختيار الصف والمادة',['زر الخطوط الثلاثة أعلى اليمين يفتح قائمة كل الصفحات.','اختر اسمك من قائمة «👨‍🏫 المعلم» فتظهر مستطيلات صفوفك، واضغط المستطيل للدخول إلى الصف ومادتك (أو اختر «جميع الصفوف» لعرض كل الصفوف).','«📚 المادة»: «كل المواد» للإنجاز الكلي أو مادة واحدة لعرض لوحتها وتقاريرها.']],
  ['✏️','رصد الدرجات',['اختر المادة، ثم استخدم + لرفع الدرجة و− لخفضها، أو اكتبها مباشرة.','اضغط Enter للانتقال إلى الطالب التالي، أو الأسهم ↑ ↓.','الخانة الحمراء = درجة أكبر من الحد الأعلى ولن تُحفظ. اترك الخانة فارغة إن لم يُقيَّم الطالب.','الحفظ تلقائي مع كل تعديل.','زر «📄 تنزيل المتابعات والمهام PDF» يُخرج كشف المادة كاملًا بعناصرها ومجاميعها.']],
  ['🗓️','الحضور والغياب',['اختر الشهر من التبويبات (سبتمبر – يناير).','اختر اليوم ثم اضغط «✓ تسجيل جميع الطلاب حضورًا»، ثم عدّل الغائبين فقط.','زر «💾 حفظ الغياب» يحفظ ويرفع الغياب فورًا، و«📄 كشف الشهر PDF» و«📄 ملخص الفصل PDF» لتنزيل كشوف الغياب.','كل ضغطة على الخانة: حاضر ← غائب ← متأخر ← بعذر ← فارغ. وزر ⊘ تحت اليوم يجعله عطلة.']],
  ['📊','لوحة المتابعة',['مؤشرات: متوسط الإنجاز، اكتمال الرصد، الممتازون، ومن يحتاجون دعمًا.','رسوم: توزيع المستويات، الإنجاز في كل مادة، وترتيب الطلاب (اضغط الاسم لفتح ملفه).','خريطة الإنجاز تكشف نقاط القوة والضعف لكل طالب في كل مادة.']],
@@ -1428,6 +1436,18 @@ function msel(kind,sel,tid){
 }
 const mselVals=el=>[...el.querySelectorAll('.mlist input:checked')].map(i=>i.value);
 let mselDirty=false;
+let meT=(()=>{try{return localStorage.getItem('grades-me')||''}catch(e){return ''}})();
+function curTeacher(){const L=S.staff||[];let t=L.find(x=>x.id===meT);if(!t&&mode==='db'&&me)t=staffByUid(me);return t||null}
+function metaHTML(){
+  const L=(S.staff||[]).slice().sort((a,b)=>a.name.localeCompare(b.name,'ar')),t=curTeacher();
+  const list=t?(t.cls||[]):CLASSES.map(c=>c.id);
+  const card=c=>{const subs=t?ttSubjIn(t,c):'';const k=t?((t.subj||[]).find(x=>(t.tt||[]).some(y=>y[3]===c&&y[4]===x))||''):'';
+    return `<button type="button" class="ccard${c===curCls?' on':''}" data-opencls="${c}"${k?` data-osub="${k}"`:''}><b>${esc(clsShort(c))}</b>${subs?`<small>${esc(subs)}</small>`:''}</button>`};
+  const role=mode!=='db'?'':isOwner||canWrite?'':mySubjects().length?'👩‍🏫 '+esc((staffByUid(me)||{}).name||'معلم')+': '+mySubjects().map(x=>esc(x.n)).join('، ')+' — تعدّل مادتك فقط':'👁 عرض فقط — لم تُسند لك مادة بعد';
+  return `<div class="mrow"><label class="clsl">👨‍🏫 المعلم: <select id="meSel" aria-label="اختر المعلم"><option value="">— جميع الصفوف —</option>${L.map(x=>`<option value="${x.id}"${t&&x.id===t.id?' selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
+   <span class="minfo">🏫 <b>${esc(clsName())}</b> · 👥 <b>${S.roster.length}</b> طالبًا${S.ct?' · معلم الصف: <b>'+esc(S.ct)+'</b>':''}</span>${role?`<span class="role">${role}</span>`:''}</div>
+   <div class="ccards" role="list" aria-label="${t?'صفوف المعلم':'صفوف المدرسة'}">${list.length?list.map(card).join(''):'<span class="mut">لا توجد صفوف مسجّلة لهذا المعلم.</span>'}</div>`;
+}
 function ctClassChips(){
   const t=(S.staff||[]).find(x=>x.id===S.ctId);if(!t||!(t.cls||[]).length)return '';
   return `<span class="ctcls"><span>صفوفه:</span>${t.cls.map(c=>`<button type="button" class="chip cl${c===curCls?' on':''}" data-gocls="${c}" title="فتح ${esc(clsShort(c))}">${esc(clsShort(c))}</button>`).join('')}</span>`;
@@ -1935,6 +1955,7 @@ document.addEventListener('click',e=>{
   if(t.id==='attPdfM'){const k=curAttMonth(),M=attMonths().find(x=>x.key===k);sheetPDF(t,'كشف الحضور والغياب - '+M.full+' - '+clsName(),attSheetMonth(k),true);return}
   if(t.id==='attPdfT'){sheetPDF(t,'ملخص الحضور والغياب - '+clsName(),attSheetTerm(),true);return}
   if(t.id==='entPdf'){sheetPDF(t,'كشف المتابعات والمهام - '+BY[curSubj].n+' - '+clsName(),gradeSheet(curSubj),true);return}
+  if(t.dataset.opencls){const c=t.dataset.opencls,k=t.dataset.osub;if(k&&BY[k]&&on(k)){curSubj=k}if(c!==curCls)openClass(c);else render();return}
   if(t.dataset.gocls){if(t.dataset.gocls!==curCls)openClass(t.dataset.gocls);return}
   if(t.dataset.qsc){const q=$('.qsubs');if(q)q.scrollBy({left:(+t.dataset.qsc)*q.clientWidth*0.8,behavior:'smooth'});return}
   if(t.id==='homeBtn'){tab='home';setOpen=false;render();window.scrollTo({top:0});return}
@@ -1967,7 +1988,7 @@ document.addEventListener('click',e=>{
   }
 });
 document.addEventListener('change',e=>{
-  {const t=e.target;if(t.id==='stSel'){stSel=t.value;render();return}if(t.id==='stCls'){stCls=t.value;render();return}}
+  {const t=e.target;if(t.id==='meSel'){meT=t.value;try{localStorage.setItem('grades-me',meT)}catch(x){}const tt=curTeacher();if(tt&&(tt.cls||[]).length&&!(tt.cls||[]).includes(curCls))openClass(tt.cls[0]);else render();return}if(t.id==='stSel'){stSel=t.value;render();return}if(t.id==='stCls'){stCls=t.value;render();return}}
   const t=e.target;
   if(t.type==='checkbox'&&t.closest&&t.closest('.nsel')){noteMselChanged(t.closest('.nsel'));return}
   if(t.id==='clsSel'){openClass(t.value);return}
