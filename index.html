@@ -360,6 +360,11 @@ body.gated{overflow:hidden}
 .gbox input{box-sizing:border-box;width:100%;min-width:0;font-size:22px;letter-spacing:.35em;text-align:center;padding:8px;border:1px solid var(--line2);border-radius:10px}
 .gbox .btn{justify-content:center;padding:10px;font-size:15.5px}
 .gbox small{color:var(--muted);margin-top:6px}
+.attbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;padding:8px 10px;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh1)}
+.attbar label{font-weight:700;color:var(--muted);font-size:13px;display:inline-flex;gap:6px;align-items:center}
+.attbar select{border:1px solid var(--line2);border-radius:9px;padding:5px 8px;font:700 13.5px var(--fh);background:#fff;color:var(--ink)}
+.attbar .sp{flex:1}.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+@media (max-width:560px){.attbar .btn{flex:1 1 100%;justify-content:center}.attbar label{flex:1 1 100%}.attbar select{flex:1}}
 /* in-app guide */
 .help{margin-top:14px}
 .hbtns{display:flex;gap:8px;flex-wrap:wrap}.hbtns a.btn{text-decoration:none}
@@ -829,6 +834,12 @@ function vAtt(v){
   v.innerHTML=`<div class="mtabs" role="tablist">${ms.map(x=>{const p=classAtt([x.key]);return `<button class="tab${x.key===key?'':' alt'}" data-attm="${x.key}" aria-selected="${x.key===key}">${x.full}${p!=null?` <small>${fmt(p,0)}%</small>`:''}</button>`}).join('')}</div>
   <div class="tools" style="margin-top:6px"><span class="leg2">${ATT.map(a=>`<span class="ab a${a[0]}">${a[2]}</span> ${a[1]}`).join(' &nbsp; ')} &nbsp; <span class="ab aO">⊘</span> عطلة</span>
    <span class="sp" style="font-weight:700;color:var(--muted);font-size:12.5px">نسبة حضور الصف في ${M.n}: <b style="color:var(--ink)">${pctS(ca)}</b></span></div>
+  ${(()=>{const ok=days.filter(x=>!off.includes(x.d)),td=today.getFullYear()===M.y&&today.getMonth()+1===M.m?today.getDate():0;
+    const def=(ok.filter(x=>x.d<=(td||99)).pop()||ok[0]||{}).d;
+    return `<div class="attbar">${ro?'':`<label>اليوم: <select id="attAllDay">${ok.map(x=>`<option value="${x.d}"${x.d===def?' selected':''}>${WD[x.wd]} ${x.d} ${M.n}</option>`).join('')}</select></label>
+     <button class="btn" id="attAllGo" type="button">✓ تسجيل جميع الطلاب حضورًا</button>
+     <button class="btn ok" id="attSaveGo" type="button">💾 حفظ الغياب</button>`}
+     <span class="sp"></span><button class="btn w" id="attPdfM" type="button">📄 كشف ${M.n} PDF</button><button class="btn w" id="attPdfT" type="button">📄 ملخص الفصل PDF</button></div>`})()}
   <p class="hint">اضغط الخانة لتتنقل بين: حاضر ← غائب ← متأخر ← بعذر ← فارغ. اضغط <b>رقم اليوم</b> لتسجيل كل من لم يُرصد «حاضر»، وزر ⊘ تحته يجعل اليوم عطلة.${ro?' <b>العرض للقراءة فقط.</b>':''}</p>
   <div class="tw card" style="border-color:var(--teal)"><table class="att"><thead><tr><th>#</th><th class="nm">الطالب</th>
    ${days.map(x=>`<th class="dh${off.includes(x.d)?' off':''}${isT(x.d)?' today':''}"><button type="button" data-attday="${x.d}" ${ro||off.includes(x.d)?'disabled':''} title="${WD[x.wd]} ${x.d} ${M.n}"><b>${x.d}</b><small>${['أحد','اثنين','ثلاثاء','أربعاء','خميس'][x.wd]}</small></button>${ro?'':`<button type="button" class="offb" data-attoff="${x.d}" title="${off.includes(x.d)?'إلغاء العطلة':'جعله عطلة'}">⊘</button>`}</th>`).join('')}
@@ -924,8 +935,8 @@ function vHome(v){
 const HELP=[
  ['🏠','الدخول والصفحة الرئيسية',['افتح رابط المنصة واكتب كلمة المرور (تُطلب مرة واحدة في كل جلسة).','تظهر الصفحة الرئيسية: بطاقة الصف الحالي بأرقامه، ثم بطاقات «ماذا تريد أن تفعل؟».','اضغط أي بطاقة للدخول إليها، و«الدخول السريع» يفتح رصد المادة مباشرة.','ارجع من أي صفحة بزر «🏠 الرئيسية» أعلى الصفحة.']],
  ['☰','التنقل واختيار الصف والمادة',['زر الخطوط الثلاثة أعلى اليمين يفتح قائمة كل الصفحات.','«🏫 الصف» ينقلك بين صفوف المدرسة؛ لكل صف طلابه ودرجاته وحضوره.','«📚 المادة»: «كل المواد» للإنجاز الكلي أو مادة واحدة لعرض لوحتها وتقاريرها.']],
- ['✏️','رصد الدرجات',['اختر المادة، ثم استخدم + لرفع الدرجة و− لخفضها، أو اكتبها مباشرة.','اضغط Enter للانتقال إلى الطالب التالي، أو الأسهم ↑ ↓.','الخانة الحمراء = درجة أكبر من الحد الأعلى ولن تُحفظ. اترك الخانة فارغة إن لم يُقيَّم الطالب.','الحفظ تلقائي مع كل تعديل.']],
- ['🗓️','الحضور والغياب',['اختر الشهر من التبويبات (سبتمبر – يناير).','اضغط رقم اليوم ليُسجَّل «حاضر» لكل من لم يُرصد، ثم عدّل الغائبين.','كل ضغطة على الخانة: حاضر ← غائب ← متأخر ← بعذر ← فارغ. وزر ⊘ تحت اليوم يجعله عطلة.']],
+ ['✏️','رصد الدرجات',['اختر المادة، ثم استخدم + لرفع الدرجة و− لخفضها، أو اكتبها مباشرة.','اضغط Enter للانتقال إلى الطالب التالي، أو الأسهم ↑ ↓.','الخانة الحمراء = درجة أكبر من الحد الأعلى ولن تُحفظ. اترك الخانة فارغة إن لم يُقيَّم الطالب.','الحفظ تلقائي مع كل تعديل.','زر «📄 تنزيل المتابعات والمهام PDF» يُخرج كشف المادة كاملًا بعناصرها ومجاميعها.']],
+ ['🗓️','الحضور والغياب',['اختر الشهر من التبويبات (سبتمبر – يناير).','اختر اليوم ثم اضغط «✓ تسجيل جميع الطلاب حضورًا»، ثم عدّل الغائبين فقط.','زر «💾 حفظ الغياب» يحفظ ويرفع الغياب فورًا، و«📄 كشف الشهر PDF» و«📄 ملخص الفصل PDF» لتنزيل كشوف الغياب.','كل ضغطة على الخانة: حاضر ← غائب ← متأخر ← بعذر ← فارغ. وزر ⊘ تحت اليوم يجعله عطلة.']],
  ['📊','لوحة المتابعة',['مؤشرات: متوسط الإنجاز، اكتمال الرصد، الممتازون، ومن يحتاجون دعمًا.','رسوم: توزيع المستويات، الإنجاز في كل مادة، وترتيب الطلاب (اضغط الاسم لفتح ملفه).','خريطة الإنجاز تكشف نقاط القوة والضعف لكل طالب في كل مادة.']],
  ['🧑‍🎓','ملف الطالب والملاحظات',['اختر الطالب أو تنقّل بزرّي السابق والتالي.','ملاحظات ولي الأمر: ثلاث قوائم (الأداء، السلوك، التوصيات) ويمكن اختيار أكثر من ملاحظة في كل قائمة.','«ملء الملاحظات تلقائيًا» يقترح ملاحظات حسب مستوى كل طالب.']],
  ['📄','التقارير',['«تقرير ولي الأمر PDF» في ملف الطالب يُخرج تقريره المصوّر.','«تقارير PDF لكل الطلاب» يُخرج ملفًا واحدًا لكل طلاب الصف.','«تصدير ملف Excel» يُخرج ملف السجل الرسمي معبأً بالدرجات.','اختر مادة من قائمة 📚 قبل التصدير لتقرير تلك المادة فقط.']],
@@ -976,7 +987,7 @@ function vDash(v){
 function vEntry(v){
   const s=BY[curSubj];
   const mine=canSubj(curSubj),locked=mine&&S.info.lock&&!unlocked,ro=!mine||locked;
-  v.innerHTML=`${!mine&&mode==='db'?`<div class="note warn">🔒 ${A()[curSubj]?'هذه المادة يرصدها معلمها فقط ('+esc(tName(A()[curSubj]))+')':'هذه المادة يرصدها المسؤول فقط'}. يمكنك الاطلاع على الدرجات دون تعديلها.</div>`:''}${locked?`<div class="note warn" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">🔒 رصد الدرجات مقفل. اكتب كلمة السر لفتح التعديل: <input type="password" id="unPw" inputmode="numeric" maxlength="20" autocomplete="off" style="width:120px" aria-label="كلمة السر"><button class="btn sm" id="unGo" type="button">فتح القفل</button><span class="msg err" id="unMsg"></span></div>`:''}<div class="tools" style="margin-top:10px"><label>🔎 بحث عن طالب: <input type="search" id="eSearch" placeholder="اكتب جزءًا من الاسم"></label><span class="sp" style="font-weight:600;color:var(--muted);font-size:12.5px">${s.part?'درجة التلاوة (من 20) تنتقل تلقائيًا إلى عمود التلاوة في التربية الإسلامية.':`المجموع الكلي من ${s.max} كما في ورقة «${esc(s.sheet.trim())}»`}</span></div>
+  v.innerHTML=`${!mine&&mode==='db'?`<div class="note warn">🔒 ${A()[curSubj]?'هذه المادة يرصدها معلمها فقط ('+esc(tName(A()[curSubj]))+')':'هذه المادة يرصدها المسؤول فقط'}. يمكنك الاطلاع على الدرجات دون تعديلها.</div>`:''}${locked?`<div class="note warn" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">🔒 رصد الدرجات مقفل. اكتب كلمة السر لفتح التعديل: <input type="password" id="unPw" inputmode="numeric" maxlength="20" autocomplete="off" style="width:120px" aria-label="كلمة السر"><button class="btn sm" id="unGo" type="button">فتح القفل</button><span class="msg err" id="unMsg"></span></div>`:''}<div class="tools" style="margin-top:10px"><label>🔎 بحث عن طالب: <input type="search" id="eSearch" placeholder="اكتب جزءًا من الاسم"></label><button class="btn w" id="entPdf" type="button">📄 تنزيل المتابعات والمهام PDF</button><span class="sp" style="font-weight:600;color:var(--muted);font-size:12.5px">${s.part?'درجة التلاوة (من 20) تنتقل تلقائيًا إلى عمود التلاوة في التربية الإسلامية.':`المجموع الكلي من ${s.max} كما في ورقة «${esc(s.sheet.trim())}»`}</span></div>
   <div class="tw card" style="margin-top:10px;border-color:var(--sc)" id="egWrap"><table class="eg"><thead>
    <tr><th rowspan="2">#</th><th rowspan="2" class="nm">اسم الطالب</th>${s.groups.map(g=>g.link?`<th class="g" rowspan="2">${esc(g.n)}<br><small style="color:var(--muted)">من ${g.max} · تلقائي</small></th>`:`<th class="g" colspan="${g.items.length+1}">${esc(g.n)}</th>`).join('')}<th rowspan="2">المجموع<br><small>من ${s.max}</small></th><th rowspan="2">نسبة الإنجاز</th></tr>
    <tr>${s.groups.filter(g=>!g.link).map(g=>g.items.map(it=>`<th class="it">${esc(it.l)}<small>${it.max}</small></th>`).join('')+`<th class="it">المجموع<small>${fmt(g.max)}</small></th>`).join('')}</tr>
@@ -1555,6 +1566,15 @@ const RP_CSS=`
 .rp .hint{font-size:11px;color:#5d6b78}
 .rp .rp-two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center}
 .rp .rp-two svg{max-width:100%}
+.rp.land{width:1123px;padding:18px 26px 22px}
+.rp .sh-info{display:flex;flex-wrap:wrap;gap:4px 22px;margin-top:8px;background:#eaf8f7;border-radius:10px;padding:6px 12px;font-weight:700;color:#0b6e75;font-size:12.5px}.rp .sh-info b{color:#1d2b3a}
+.rp table.sh th,.rp table.sh td{border:1px solid #d9dee5;padding:2px 3px;font-size:11px;line-height:1.35}
+.rp table.sh th{background:#123a52;color:#fff;font-size:10.5px}.rp table.sh th.g{background:#0f7a83}.rp table.sh th small{display:block;font-weight:600;color:#cde9ec;font-size:9.5px}
+.rp table.sh td.nm{font-size:11.5px}.rp table.sh tr:nth-child(even) td{background:#f7f9fb}
+.rp table.sh td.tot{font-weight:800;background:#edf6f7!important}.rp table.sh td.off{background:#eceff3!important;color:#9aa5b1}
+.rp table.sh td.aP{color:#1f9d55;font-weight:800}.rp table.sh td.aA{color:#fff;background:#d64545!important;font-weight:800}.rp table.sh td.aL{color:#7a5a00;background:#ffe9a8!important;font-weight:800}.rp table.sh td.aE{color:#fff;background:#4c7cf0!important;font-weight:800}
+.rp table.sh td.ov{color:#d64545;font-weight:800}
+.rp .sh-leg{margin-top:6px;font-size:11px;color:#5d6b78;font-weight:600}
 .rp svg text{font-family:'Segoe UI',Tahoma,'Geeza Pro','Noto Sans Arabic','Noto Naskh Arabic',Arial,sans-serif}`;
 function rpTop(st,I,title,extra){
   const today=new Date().toLocaleDateString('ar-BH',{year:'numeric',month:'long',day:'numeric'});
@@ -1637,16 +1657,18 @@ function reportBody(st){
 }
 const isSafari=/^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
 async function makePDF(st){const pdf=await PDFLib.PDFDocument.create();pdf.setTitle('تقرير '+st.name);await addStudentPages(pdf,st);return await pdf.save()}
-async function addStudentPages(pdf,st){
+async function addStudentPages(pdf,st){return addHtmlPages(pdf,reportBody(st))}
+async function addHtmlPages(pdf,body,land){
   if(!window.htmlToImage||!window.PDFLib)throw new Error('lib');
+  const W=land?1123:794,PW=land?841.89:595.28,PHt=land?595.28:841.89;
   const host=document.createElement('div');host.setAttribute('aria-hidden','true');
-  host.style.cssText='position:fixed;left:-12000px;top:0;width:794px;z-index:-1;pointer-events:none';
-  host.innerHTML=`<style>${RP_CSS}</style><div class="rp" dir="rtl" lang="ar">${reportBody(st)}</div>`;
+  host.style.cssText='position:fixed;left:-12000px;top:0;width:'+W+'px;z-index:-1;pointer-events:none';
+  host.innerHTML=`<style>${RP_CSS}</style><div class="rp${land?' land':''}" dir="rtl" lang="ar">${body}</div>`;
   document.body.appendChild(host);
   try{
     const el=host.querySelector('.rp');
     await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-    const W=794,H=Math.ceil(el.scrollHeight),PH=Math.floor(W*841.89/595.28)-40;
+    const H=Math.ceil(el.scrollHeight),PH=Math.floor(W*PHt/PW)-40;
     const top0=el.getBoundingClientRect().top;
     const cands=[...el.children,...el.querySelectorAll('tr,.rp-leg')].map(n=>Math.round(n.getBoundingClientRect().bottom-top0)+3).sort((a,b)=>a-b);
     const breaks=[0];let start=0;
@@ -1661,12 +1683,70 @@ async function addStudentPages(pdf,st){
       part.width=canvas.width;part.height=Math.max(1,Math.round((b-a)*k));
       const g=part.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,part.width,part.height);g.drawImage(canvas,0,-Math.round(a*k));if(i>0){g.fillStyle='#fff';g.fillRect(0,0,part.width,Math.round(5*k))}
       const bytes=await (await fetch(part.toDataURL('image/jpeg',0.9))).arrayBuffer();
-      const img=await pdf.embedJpg(bytes),page=pdf.addPage([595.28,841.89]);
-      const w=595.28,h=(b-a)*w/W,mt=i===0?0:16;
-      page.drawImage(img,{x:0,y:841.89-mt-h,width:w,height:h});
-      if(breaks.length>2)page.drawText(String(i+1)+' / '+String(breaks.length-1),{x:290,y:12,size:9});
+      const img=await pdf.embedJpg(bytes),page=pdf.addPage([PW,PHt]);
+      const w=PW,h=(b-a)*w/W,mt=i===0?0:16;
+      page.drawImage(img,{x:0,y:PHt-mt-h,width:w,height:h});
+      if(breaks.length>2)page.drawText(String(i+1)+' / '+String(breaks.length-1),{x:PW/2-8,y:12,size:9});
     }
   }finally{host.remove()}
+}
+/* ---------- class sheets as PDF: attendance (month / term) and grade follow-up ---------- */
+function shHead(title,info){
+  const I=S.info,today=new Date().toLocaleDateString('ar-BH-u-nu-latn',{year:'numeric',month:'long',day:'numeric'});
+  return `<div class="rp-hd"><img src="${LETTERHEAD}" alt=""></div><div class="rp-tb"><h1>${title}</h1><small>${esc(I.term||'')} <span dir="ltr">${esc(I.year||'')}</span></small></div>
+  <div class="sh-info"><span>الصف: <b>${esc(clsName())}</b></span>${S.ct?`<span>معلم الصف: <b>${esc(S.ct)}</b></span>`:''}<span>عدد الطلاب: <b>${S.roster.length}</b></span>${info||''}<span>تاريخ الطباعة: <b>${today}</b></span></div>`;
+}
+const shSig=()=>`<div class="rp-sig"><span>المعلم: <i></i></span><span>التوقيع: <i></i></span><span>يعتمد مدير المدرسة: ${esc(S.info.principal||'')}</span></div>`;
+function attSheetMonth(key){
+  const M=attMonths().find(x=>x.key===key),days=schoolDays(M.y,M.m),A_=S.att[key]||{},off=A_.off||[];
+  const ca=classAtt([key]);
+  const rows=S.roster.map((st,i)=>{const row=(A_.v||{})[st.id]||{},a=attStats(st.id,[key]);
+    return `<tr><td>${i+1}</td><td class="nm">${esc(st.name)}</td>${days.map(x=>off.includes(x.d)?'<td class="off">⊘</td>':`<td class="${row[x.d]?'a'+row[x.d]:''}">${ATT_SYM[row[x.d]]||''}</td>`).join('')}<td class="tot">${a.P||''}</td><td class="tot">${a.A||''}</td><td class="tot">${a.E||''}</td><td class="tot">${a.L||''}</td><td class="tot">${a.pct==null?'—':fmt(a.pct,0)+'%'}</td></tr>`}).join('');
+  return shHead('كشف الحضور والغياب — '+M.full,`<span>نسبة حضور الصف: <b>${pctS(ca)}</b></span>`)+
+   `<table class="sh" style="margin-top:8px"><thead><tr><th>#</th><th class="nm">اسم الطالب</th>${days.map(x=>`<th${off.includes(x.d)?' class="g"':''}>${x.d}<small>${WD[x.wd].replace('ال','').slice(0,3)}</small></th>`).join('')}<th class="g">حضور</th><th class="g">غياب</th><th class="g">بعذر</th><th class="g">تأخر</th><th class="g">%</th></tr></thead><tbody>${rows}</tbody></table>
+   <div class="sh-leg">✓ حاضر · غ غائب · ع غياب بعذر · ت متأخر · ⊘ عطلة · الخانة الفارغة = لم يُرصد</div>`+shSig();
+}
+function attSheetTerm(){
+  const ms=attMonths();
+  const rows=S.roster.map((st,i)=>{const t=attStats(st.id);
+    return `<tr><td>${i+1}</td><td class="nm">${esc(st.name)}</td>${ms.map(m=>{const a=attStats(st.id,[m.key]);return a.days?`<td>${a.A||0}</td><td>${a.E||0}</td><td>${a.L||0}</td><td class="tot">${fmt(a.pct,0)}%</td>`:'<td>—</td><td>—</td><td>—</td><td class="tot">—</td>'}).join('')}<td class="tot">${t.A}</td><td class="tot">${t.E}</td><td class="tot">${t.L}</td><td class="tot">${t.pct==null?'—':fmt(t.pct,0)+'%'}</td></tr>`}).join('');
+  return shHead('ملخص الحضور والغياب للفصل الدراسي',`<span>نسبة حضور الصف: <b>${pctS(classAtt())}</b></span>`)+
+   `<table class="sh" style="margin-top:8px"><thead><tr><th rowspan="2">#</th><th rowspan="2" class="nm">اسم الطالب</th>${ms.map(m=>`<th colspan="4" class="g">${m.full}</th>`).join('')}<th colspan="4">المجموع</th></tr>
+   <tr>${ms.concat([{}]).map(()=>'<th>غياب</th><th>بعذر</th><th>تأخر</th><th>%</th>').join('')}</tr></thead><tbody>${rows}</tbody></table>`+shSig();
+}
+function gradeSheet(k){
+  const s=BY[k],gs=s.groups;
+  const head1=gs.map(g=>g.link?`<th class="g" rowspan="2">${esc(g.n)}<small>من ${fmt(g.max)}</small></th>`:`<th class="g" colspan="${g.items.length+1}">${esc(g.n)}</th>`).join('');
+  const head2=gs.map(g=>g.link?'':g.items.map(it=>`<th>${esc(it.l)}<small>${fmt(it.max)}</small></th>`).join('')+`<th class="g">المجموع<small>${fmt(g.max)}</small></th>`).join('');
+  const rows=S.roster.map((st,i)=>{const arr=(S.marks[k]||{})[st.id]||[],t=subjStats(k,st.id);
+    return `<tr><td>${i+1}</td><td class="nm">${esc(st.name)}</td>${gs.map((g,gi)=>{const gt=t.groups[gi];const tot=`<td class="tot">${gt.ent?fmt(gt.earned):''}</td>`;
+      return g.link?tot:g.items.map(it=>{const v=arr[it.i];return `<td${typeof v==='number'&&v>it.max?' class="ov"':''}>${typeof v==='number'?fmt(v):''}</td>`}).join('')+tot}).join('')}
+      <td class="tot">${t.ent?fmt(t.earned):''}</td><td class="tot">${t.pct==null?'—':fmt(t.pct,0)+'%'}</td><td>${t.pct==null?'':level(t.pct).n}</td></tr>`}).join('');
+  const c=classStats(k);
+  return shHead('كشف المتابعات والمهام — '+esc(s.n),`<span>المادة: <b>${esc(s.n)}</b> (من ${s.max})</span><span>متوسط الإنجاز: <b>${pctS(c.avg)}</b></span><span>اكتمال الرصد: <b>${pctS(c.comp*100)}</b></span>${A()[k]?`<span>معلم المادة: <b>${esc(tName(A()[k]))}</b></span>`:''}`)+
+   `<table class="sh" style="margin-top:8px"><thead><tr><th rowspan="2">#</th><th rowspan="2" class="nm">اسم الطالب</th>${head1}<th rowspan="2">المجموع<small>من ${s.max}</small></th><th rowspan="2">الإنجاز</th><th rowspan="2">المستوى</th></tr><tr>${head2}</tr></thead><tbody>${rows}</tbody></table>
+   <div class="sh-leg">الخانة الفارغة = لم يُرصد بعد · نسبة الإنجاز محسوبة مما رُصد حتى الآن</div>`+shSig();
+}
+async function sheetPDF(btn,name,body,land){
+  if(!S.roster.length){toast('لا يوجد طلاب في هذا الصف');return}
+  if(!canDL()){toast('التنزيل غير متاح في هذا العرض');return}
+  const old=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='⏳ جارٍ إنشاء PDF…'}
+  try{const pdf=await PDFLib.PDFDocument.create();pdf.setTitle(name);await addHtmlPages(pdf,body,land);
+    const ok=await saveFile(safeName(name)+'.pdf',new Blob([await pdf.save()],{type:'application/pdf'}));if(ok)toast('📄 تم تنزيل «'+name+'»')}
+  catch(e){console.error(e);toast('تعذّر إنشاء ملف PDF')}
+  finally{if(btn){btn.disabled=false;btn.textContent=old}}
+}
+function attSaveNow(){
+  saveAtt(curAttMonth());
+  if(mode==='local'){saveLocal();if(ghReady()){clearTimeout(ghTimer);ghPush().then(ok=>toast(ok?'☁️ حُفظ الغياب ورُفع إلى GitHub':'💾 حُفظ على هذا الجهاز — تعذّر الرفع الآن وسيُعاد تلقائيًا'))}else toast('💾 حُفظ الغياب على هذا الجهاز')}
+  else toast('💾 تم حفظ الغياب');
+}
+function attAllPresent(){
+  const sel=$('#attAllDay'),d=sel?+sel.value:0;if(!d){toast('اختر اليوم أولًا');return}
+  const key=curAttMonth(),off=((S.att[key]||{}).off||[]);if(off.includes(d)){toast('هذا اليوم مسجّل عطلة');return}
+  let n=0;S.roster.forEach(st=>{if(!((((S.att[key]||{}).v||{})[st.id]||{})[d])){attSet(st.id,d,'P');n++}});
+  saveAtt(key);render();attSaveNow();
+  setTimeout(()=>toast(n?'✓ سُجّل '+n+' طالبًا حاضرًا يوم '+d+' وحُفظ الغياب':'كل الطلاب مرصودون في يوم '+d+' مسبقًا'),900);
 }
 const repName=st=>'تقرير '+safeName(st.name)+(scope==='all'?'':' - '+BY[scope].n)+'.pdf';
 async function exportOne(id){
@@ -1755,6 +1835,11 @@ document.addEventListener('click',e=>{
   if(t.dataset.sdel){if(staffDelArm===t.dataset.sdel){const st=S.staff.find(x=>x.id===staffDelArm);S.staff=S.staff.filter(x=>x.id!==staffDelArm);staffDelArm=null;saveStaff();(async()=>{if(st&&st.uid)await syncStaffAssign(Object.assign({},st,{uid:''}),st.uid);render();toast('حُذف المعلم من القائمة')})()}else{staffDelArm=t.dataset.sdel;render()}return}
   if(t.dataset.copy){const v=t.dataset.copy;try{navigator.clipboard.writeText(v).then(()=>toast('نُسخ البريد: '+v),()=>toast(v))}catch(e){toast(v)}return}
   if(t.id==='menuBtn'){openDrawer(true);return}
+  if(t.id==='attAllGo'){attAllPresent();return}
+  if(t.id==='attSaveGo'){attSaveNow();return}
+  if(t.id==='attPdfM'){const k=curAttMonth(),M=attMonths().find(x=>x.key===k);sheetPDF(t,'كشف الحضور والغياب - '+M.full+' - '+clsName(),attSheetMonth(k),true);return}
+  if(t.id==='attPdfT'){sheetPDF(t,'ملخص الحضور والغياب - '+clsName(),attSheetTerm(),true);return}
+  if(t.id==='entPdf'){sheetPDF(t,'كشف المتابعات والمهام - '+BY[curSubj].n+' - '+clsName(),gradeSheet(curSubj),true);return}
   if(t.id==='homeBtn'){tab='home';setOpen=false;render();window.scrollTo({top:0});return}
   if(t.dataset.nav){const n=t.dataset.nav;if(t.dataset.sub){curSubj=t.dataset.sub;if(n!=='entry')scope=t.dataset.sub}if(n!=='set')setOpen=false;tab=n;delArm=null;clrArm=false;render();window.scrollTo({top:0});return}
   if(t.id==='drawerX'){openDrawer(false);return}
