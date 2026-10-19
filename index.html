@@ -367,6 +367,8 @@ body.gated{overflow:hidden}
 @media (max-width:560px){.attbar .btn{flex:1 1 100%;justify-content:center}.attbar label{flex:1 1 100%}.attbar select{flex:1}}
 /* teachers timetable */
 #ctSelH,#iCt{max-width:340px;text-overflow:ellipsis}
+.ctcls{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:12.5px;color:var(--muted);font-weight:700}.ctcls .chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+@media (max-width:560px){.ctcls{flex:1 1 100%}}
 .seg{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:4px}
 .seg button{border:0;background:transparent;border-radius:9px;padding:7px 12px;font:700 13.5px var(--fh);color:var(--muted);cursor:pointer}
 .seg button.on{background:#fff;color:var(--navy);box-shadow:var(--sh1)}
@@ -898,7 +900,7 @@ function renderHeader(){
   $('#sumComp').textContent=pctS(c.comp*100);$('#barComp').style.width=(c.comp*100)+'%';
   const I=S.info;
   $('#subTitle').innerHTML=esc(clsName())+' · '+esc(scopeName())+' · '+esc(I.term||'')+' <span dir="ltr">'+esc(I.year||'')+'</span>';
-  $('#meta').innerHTML=`<label class="clsl">🏫 الصف: <select id="clsSel">${(()=>{const o=c=>`<option value="${c.id}"${c.id===curCls?' selected':''}>${esc(c.n)}</option>`;const mine=teacherClasses();return mine.length?`<optgroup label="✏️ صفوفي">${CLASSES.filter(c=>mine.includes(c.id)).map(o).join('')}</optgroup><optgroup label="باقي الصفوف (اطلاع)">${CLASSES.filter(c=>!mine.includes(c.id)).map(o).join('')}</optgroup>`:CLASSES.map(o).join('')})()}</select></label>${canWrite&&mode!=='loading'?`<label class="clsl">👨‍🏫 معلم الصف: ${ctSelect('ctSelH')}</label>`:`<span>👨‍🏫 معلم الصف: <b>${esc(S.ct||'—')}</b></span>`}<span>👥 عدد الطلاب: <b>${S.roster.length}</b></span><span>📚 المواد: <b>${CNT().length}</b>${on('til')?' + التلاوة':''}</span><span class="role">${mode!=='db'?'':isOwner||canWrite?'':mySubjects().length?'👩‍🏫 '+esc((staffByUid(me)||{}).name||'معلم')+': '+mySubjects().map(x=>esc(x.n)).join('، ')+' — تعدّل مادتك فقط':'👁 عرض فقط — لم تُسند لك مادة بعد'}</span>`;
+  $('#meta').innerHTML=`<label class="clsl">🏫 الصف: <select id="clsSel">${(()=>{const o=c=>`<option value="${c.id}"${c.id===curCls?' selected':''}>${esc(c.n)}</option>`;const mine=teacherClasses();return mine.length?`<optgroup label="✏️ صفوفي">${CLASSES.filter(c=>mine.includes(c.id)).map(o).join('')}</optgroup><optgroup label="باقي الصفوف (اطلاع)">${CLASSES.filter(c=>!mine.includes(c.id)).map(o).join('')}</optgroup>`:CLASSES.map(o).join('')})()}</select></label>${canWrite&&mode!=='loading'?`<label class="clsl">👨‍🏫 معلم الصف: ${ctSelect('ctSelH')}</label>${ctClassChips()}`:`<span>👨‍🏫 معلم الصف: <b>${esc(S.ct||'—')}</b></span>`}<span>👥 عدد الطلاب: <b>${S.roster.length}</b></span><span>📚 المواد: <b>${CNT().length}</b>${on('til')?' + التلاوة':''}</span><span class="role">${mode!=='db'?'':isOwner||canWrite?'':mySubjects().length?'👩‍🏫 '+esc((staffByUid(me)||{}).name||'معلم')+': '+mySubjects().map(x=>esc(x.n)).join('، ')+' — تعدّل مادتك فقط':'👁 عرض فقط — لم تُسند لك مادة بعد'}</span>`;
   document.querySelectorAll('.tab[data-t="studs"],.tab[data-t="set"]').forEach(b=>b.hidden=mode==='db'&&!canWrite);
   if(mode==='db'&&!canWrite&&(tab==='studs'||tab==='set'))tab='dash';
   $('#fPrin').textContent=I.principal||'';
@@ -1426,6 +1428,10 @@ function msel(kind,sel,tid){
 }
 const mselVals=el=>[...el.querySelectorAll('.mlist input:checked')].map(i=>i.value);
 let mselDirty=false;
+function ctClassChips(){
+  const t=(S.staff||[]).find(x=>x.id===S.ctId);if(!t||!(t.cls||[]).length)return '';
+  return `<span class="ctcls"><span>صفوفه:</span>${t.cls.map(c=>`<button type="button" class="chip cl${c===curCls?' on':''}" data-gocls="${c}" title="فتح ${esc(clsShort(c))}">${esc(clsShort(c))}</button>`).join('')}</span>`;
+}
 function ctSelect(id,dis){
   const L=(S.staff||[]).slice().sort((a,b)=>a.name.localeCompare(b.name,'ar'));
   const known=L.some(t=>t.id===S.ctId);
@@ -1929,6 +1935,7 @@ document.addEventListener('click',e=>{
   if(t.id==='attPdfM'){const k=curAttMonth(),M=attMonths().find(x=>x.key===k);sheetPDF(t,'كشف الحضور والغياب - '+M.full+' - '+clsName(),attSheetMonth(k),true);return}
   if(t.id==='attPdfT'){sheetPDF(t,'ملخص الحضور والغياب - '+clsName(),attSheetTerm(),true);return}
   if(t.id==='entPdf'){sheetPDF(t,'كشف المتابعات والمهام - '+BY[curSubj].n+' - '+clsName(),gradeSheet(curSubj),true);return}
+  if(t.dataset.gocls){if(t.dataset.gocls!==curCls)openClass(t.dataset.gocls);return}
   if(t.dataset.qsc){const q=$('.qsubs');if(q)q.scrollBy({left:(+t.dataset.qsc)*q.clientWidth*0.8,behavior:'smooth'});return}
   if(t.id==='homeBtn'){tab='home';setOpen=false;render();window.scrollTo({top:0});return}
   if(t.dataset.nav){const n=t.dataset.nav;if(t.dataset.sub){curSubj=t.dataset.sub;if(n!=='entry')scope=t.dataset.sub}if(n!=='set')setOpen=false;tab=n;delArm=null;clrArm=false;render();window.scrollTo({top:0});return}
