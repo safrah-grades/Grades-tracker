@@ -103,8 +103,8 @@ table.eg th.g{border-inline:2px solid var(--line);font-size:13px}
 table.eg th.it{font-size:11.5px;font-weight:700;color:var(--ink);max-width:110px;white-space:normal;line-height:1.3}
 table.eg th.it small{display:block;color:var(--muted);font-weight:800}
 table.eg td{padding:3px 3px}
-table.eg td.nm{position:sticky;right:0;background:var(--paper);z-index:1;box-shadow:-2px 0 0 var(--line);min-width:180px}
-table.eg thead th.nm{position:sticky;right:0;z-index:2}
+table.eg td.nm{background:var(--paper);min-width:180px}
+
 .stp{display:inline-flex;align-items:center;gap:2px}
 .pm{font-family:inherit;width:22px;height:26px;border:0;border-radius:7px;background:var(--teal-l);color:var(--teal-d);font-size:16px;font-weight:800;line-height:1;cursor:pointer;padding:0;display:grid;place-items:center;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .pm:hover{background:var(--teal);color:#fff}.pm[data-d="-1"]{background:var(--pink-l);color:var(--no)}.pm[data-d="-1"]:hover{background:var(--no);color:#fff}
@@ -121,7 +121,13 @@ td.ro{color:var(--muted);font-weight:700;background:var(--blue-l)}
   .hm td.nm,.hm th.nm,table.eg td.nm,table.eg thead th.nm,table.att td.nm,table.att thead th.nm{position:static!important;-webkit-transform:none!important;transform:none!important;box-shadow:none!important;will-change:auto!important}
   .tabs{position:static}
 }
-.hm td.nm,table.eg td.nm,table.eg thead th.nm{-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0);-webkit-backface-visibility:hidden;backface-visibility:hidden;background-clip:padding-box}
+.hm td.nm{-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0);-webkit-backface-visibility:hidden;backface-visibility:hidden;background-clip:padding-box}
+.fzw{position:relative}
+.fz{position:absolute;top:0;right:0;z-index:3;pointer-events:none;background:var(--paper);border-left:2px solid var(--teal);box-shadow:-6px 0 12px -6px rgba(16,24,40,.25);border-radius:0 14px 14px 0;overflow:hidden;opacity:0;transition:opacity .15s;contain:layout paint}
+.fz.show{opacity:1}
+.fz div{position:absolute;right:0;left:0;display:flex;align-items:center;gap:6px;padding:0 10px;font-weight:700;font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--line)}
+.fz div.h{background:#fffaf2;color:var(--muted);font-size:12.5px}.fz div i{font-style:normal;color:var(--muted);font-weight:600;font-size:12px;min-width:18px}
+.fz div:nth-child(even):not(.h){background:#fbfcfd}
 table.eg thead th.nm{background:#fffaf2}
 .hint{font-size:12.5px;color:var(--muted);margin:8px 2px 0;font-weight:600}
 /* profile */
@@ -168,8 +174,8 @@ table.sl td{padding:4px 6px}
 .mtabs .tab.alt{border-color:var(--orange);color:var(--orange-d)}
 .leg2{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:12.5px}
 table.att{min-width:760px}table.att th,table.att td{padding:2px 1px}
-table.att td.nm{position:sticky;right:0;background:var(--paper);z-index:1;box-shadow:-2px 0 0 var(--line);min-width:170px;padding:2px 8px;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}
-table.att thead th.nm{position:sticky;right:0;z-index:2;background:#fffaf2}
+table.att td.nm{background:var(--paper);min-width:170px;padding:2px 8px}
+table.att thead th.nm{background:#fffaf2}
 .att th.dh{min-width:32px;vertical-align:bottom}.att th.dh button[data-attday]{display:grid;width:100%;border:0;background:none;font-family:inherit;color:var(--teal-d);cursor:pointer;padding:2px 0;line-height:1.15}
 .att th.dh b{font-size:13.5px}.att th.dh small{font-size:8.5px;color:var(--muted);white-space:nowrap}
 .att th.dh .offb{border:0;background:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0 0 2px;opacity:.6}
@@ -936,6 +942,7 @@ function render(){
   if(tab==='home'&&mode!=='loading'&&!(mode==='db'&&!rosterLoaded)){vHome(v);return}
   if(mode==='loading'||(mode==='db'&&!rosterLoaded)){v.innerHTML='<div class="empty">جارٍ تحميل السجل…</div>';return}
   if(!S.roster.length&&tab!=='studs'&&tab!=='set'&&tab!=='help'&&tab!=='staff'){v.innerHTML=`<div class="note warn" style="margin-top:14px">لا توجد أسماء طلاب في ${esc(clsName())} بعد. افتح تبويب <b>الطلاب</b> لإضافة الأسماء أو استيرادها من ملف Excel.</div>`;return}
+  setTimeout(freezeNames,0);
   ({home:vHome,help:vHelp,staff:vStaff,dash:vDash,entry:vEntry,att:vAtt,prof:vProf,studs:vStuds,set:vSet})[tab](v);
 }
 
@@ -1042,6 +1049,28 @@ function ttPdfBody(){
      <div class="sh-leg" style="margin-top:6px">${T.map(x=>`${esc(x.s)}: ${esc(x.t.name)} (${x.n})`).join(' · ')}</div>`+shSig()}
   const t=(S.staff||[]).find(x=>x.id===stSel);if(!t)return '';
   return head('جدول حصص المعلم: '+esc(t.name),`<span>المواد: <b>${esc((t.subj||[]).map(k=>BY[k].n).join('، ')||'—')}</b></span><span>الصفوف: <b>${esc((t.cls||[]).map(clsShort).join('، ')||'—')}</b></span><span>الحصص: <b>${t.per||0}</b></span>`)+`<div style="margin-top:8px">${ttTeacherGrid(t)}</div>`+shSig();
+}
+/* frozen names column for wide tables (overlay — no sticky, so no flicker on iPad) */
+function freezeNames(){
+  document.querySelectorAll('table.eg,table.att').forEach(tb=>{
+    const tw=tb.closest('.tw');if(!tw)return;
+    let w=tw.parentElement;if(!w.classList.contains('fzw')){w=document.createElement('div');w.className='fzw';tw.parentNode.insertBefore(w,tw);w.appendChild(tw)}
+    let fz=w.querySelector(':scope>.fz');if(!fz){fz=document.createElement('div');fz.className='fz';fz.setAttribute('aria-hidden','true');w.appendChild(fz)}
+    const build=()=>{
+      const nm=tb.querySelector('tbody td.nm');if(!nm){fz.innerHTML='';return}
+      const W=Math.min(nm.getBoundingClientRect().width+34,tw.clientWidth*0.48);
+      const t0=tw.getBoundingClientRect().top-tw.scrollTop,head=tb.tHead?tb.tHead.getBoundingClientRect():null;let h='';
+      if(head)h+=`<div class="h" style="top:${head.top-t0}px;height:${head.height}px">الطالب</div>`;
+      tb.querySelectorAll('tbody tr').forEach(tr=>{if(tr.hidden)return;const r=tr.getBoundingClientRect(),c=tr.querySelector('.nm');if(!c)return;
+        h+=`<div style="top:${r.top-t0}px;height:${r.height}px"><i>${esc(tr.children[0].textContent)}</i>${esc(c.textContent.trim())}</div>`});
+      fz.style.width=W+'px';fz.style.top=tw.offsetTop+'px';fz.style.height=tw.clientHeight+'px';fz.innerHTML=h;
+    };
+    const sync=()=>{fz.classList.toggle('show',Math.abs(tw.scrollLeft)>12)};
+    build();sync();
+    if(!tw._fz){tw._fz=1;tw.addEventListener('scroll',sync,{passive:true});
+      if(window.ResizeObserver){const ro=new ResizeObserver(()=>{build();sync()});ro.observe(tb)}}
+    tw._fzb=build;
+  });
 }
 function vDash(v){
   if(scope!=='all')return vDashSubj(v);
@@ -2000,7 +2029,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='stQ'){stQ=t.value;const q=arNorm(stQ);document.querySelectorAll('table.stt tbody tr').forEach(tr=>{tr.hidden=q&&!arNorm(tr.textContent).includes(q)});return}
-  if(t.id==='eSearch'){const q=t.value.trim();document.querySelectorAll('table.eg tbody tr').forEach(tr=>{tr.hidden=q&&!tr.children[1].textContent.includes(q)})}
+  if(t.id==='eSearch'){const q=t.value.trim();document.querySelectorAll('table.eg tbody tr').forEach(tr=>{tr.hidden=q&&!tr.children[1].textContent.includes(q)});const tw=document.querySelector('#egWrap');if(tw&&tw._fzb)tw._fzb()}
   if(t.dataset&&t.dataset.f){const tr=t.closest('tr'),st=S.roster.find(s=>s.id===tr.dataset.sid);if(st){st[t.dataset.f]=t.dataset.f==='pid'?normDigits(t.value):t.value;saveRoster();renderHeader()}}
   if(t.id==='nX'){setNote(curStud,'x',t.value.trim())}
   if(t.dataset&&t.dataset.k){S.info[t.dataset.k]=t.value;saveInfo();renderHeader()}
