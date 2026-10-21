@@ -377,7 +377,7 @@ table.wkt th{background:var(--soft);font-size:13px;color:var(--ink)}table.wkt th
 table.wkt td.nm,table.wkt th.nm{text-align:start;white-space:nowrap;font-weight:700}table.wkt td.pc{font-weight:700;color:var(--muted)}
 .wkcol{display:block;margin:4px auto 0;border:1px solid var(--line2);background:#fff;border-radius:7px;padding:1px 8px;font:700 11.5px var(--fh);color:var(--teal-d);cursor:pointer}
 .wkb{width:38px;height:32px;border-radius:9px;border:1.5px solid var(--line2);background:#fff;font:800 17px var(--fh);cursor:pointer;display:inline-grid;place-items:center;vertical-align:middle;touch-action:manipulation}
-.wkb.wy{background:var(--ok);border-color:var(--ok);color:#fff}.wkb.wn{background:#d64545;border-color:#d64545;color:#fff}
+.wkb.wy{background:var(--ok);border-color:var(--ok);color:#fff}.wkb.wh{background:#f3c64d;border-color:#d9a92a;color:#5a4300;font-size:12px;width:46px}span.wkb.wh{width:24px}.wkb.wn{background:#d64545;border-color:#d64545;color:#fff}
 span.wkb{width:24px;height:22px;font-size:13px;cursor:default}
 .wordb{background:#eef3fd!important;color:#2b579a!important;border-color:#c9d7f2!important}
 .wkdt{font-weight:700;color:var(--teal-d);font-size:13px}
@@ -933,7 +933,7 @@ function attOff(d){if(!canWrite)return;const key=curAttMonth(),M=S.att[key]||(S.
 /* attendance block inside the parent report */
 function rpWrk(st,R,sk){
   const ms=attMonths(),pc=p=>p==null?'—':fmt(p,0)+'%';
-  const td=x=>`<td style="font-weight:800;color:${x===1?'#1f9d55':x===0?'#d64545':'#9aa5b1'}">${x===1?'✓':x===0?'✗':'—'}</td>`;
+  const td=x=>`<td style="font-weight:800;color:${x===1?'#1f9d55':x===2?'#b8860b':x===0?'#d64545':'#9aa5b1'}">${x===1?'✓':x===2?'ناقص':x===0?'✗':'—'}</td>`;
   if(sk&&sk!=='all'){const W=(S.wrk||{})[sk]||{};if(!ms.some(m=>((W[m.key]||{}).v||{})[st.id]))return '';
     const rows=ms.filter(m=>(W[m.key]||{}).v).map(m=>{const r=((W[m.key]||{}).v||{})[st.id]||[];return `<tr><td class="rp-n">${m.full}</td>${[0,1,2].map(j=>td(r[j])).join('')}<td><b>${pc(wkStats(sk,st.id,[m.key]).pct)}</b></td></tr>`}).join('');
     return `<h2>متابعة الأعمال الكتابية</h2><table><thead><tr><th style="text-align:right">الشهر</th><th>المذكرة</th><th>الأنشطة</th><th>كتاب التدريبات</th><th>الانتظام</th></tr></thead><tbody>${rows}
@@ -1027,7 +1027,7 @@ const HELP=[
  ['☰','التنقل واختيار الصف والمادة',['زر الخطوط الثلاثة أعلى اليمين يفتح قائمة كل الصفحات.','اختر اسمك من قائمة «👨‍🏫 المعلم» فتظهر مستطيلات صفوفك، واضغط المستطيل للدخول إلى الصف ومادتك (أو اختر «المعلمين» لعرض كل الصفوف).','«📚 المادة»: «كل المواد» للإنجاز الكلي أو مادة واحدة لعرض لوحتها وتقاريرها.']],
  ['✏️','رصد الدرجات',['اختر المادة، ثم استخدم + لرفع الدرجة و− لخفضها، أو اكتبها مباشرة.','اضغط Enter للانتقال إلى الطالب التالي، أو الأسهم ↑ ↓.','الخانة الحمراء = درجة أكبر من الحد الأعلى ولن تُحفظ. اترك الخانة فارغة إن لم يُقيَّم الطالب.','الحفظ تلقائي مع كل تعديل.','زر «📄 تنزيل المتابعات والمهام PDF» يُخرج كشف المادة كاملًا بعناصرها ومجاميعها.']],
  ['🗓️','الحضور والغياب',['اختر الشهر من التبويبات (سبتمبر – يناير).','اختر اليوم ثم اضغط «✓ تسجيل جميع الطلاب حضورًا»، ثم عدّل الغائبين فقط.','زر «💾 حفظ الغياب» يحفظ ويرفع الغياب فورًا، و«📄 كشف الشهر PDF» و«📄 ملخص الفصل PDF» لتنزيل كشوف الغياب.','كل ضغطة على الخانة: حاضر ← غائب ← متأخر ← بعذر ← فارغ. وزر ⊘ تحت اليوم يجعله عطلة.']],
- ['📒','متابعة الأعمال الكتابية',['متابعة واحدة في نهاية كل شهر لانتظام حل: المذكرة، الأنشطة، كتاب التدريبات.','اختر الشهر، وتاريخ المتابعة يُضبط تلقائيًا على آخر يوم دراسي ويمكن تغييره.','اضغط الخانة: ✓ منتظم ← ✗ غير منتظم ← فارغ، أو «✓ الكل» لعمود كامل، أو «✓ الجميع منتظم» ثم عدّل غير المنتظمين.','«💾 حفظ المتابعة» يحفظ ويرفع فورًا، وزرّا PDF لكشف الشهر وملخص الفصل.']],
+ ['📒','متابعة الأعمال الكتابية',['متابعة واحدة في نهاية كل شهر لانتظام حل: المذكرة، الأنشطة، كتاب التدريبات.','اختر الشهر، وتاريخ المتابعة يُضبط تلقائيًا على آخر يوم دراسي ويمكن تغييره.','اضغط الخانة: ✓ منتظم ← ناقص ← ✗ غير منتظم ← فارغ، أو «✓ الكل» لعمود كامل، أو «✓ الجميع منتظم» ثم عدّل غير المنتظمين.','«💾 حفظ المتابعة» يحفظ ويرفع فورًا، وزرّا PDF لكشف الشهر وملخص الفصل.']],
  ['📈','تحليل الدرجات والتصنيف',['«أساس التصنيف»: متوسط الاختبارات، أو الدرجة الكلية للمادة بكل عناصر تقييمها.','اختر المادة، واكتب درجة الاختبار التشخيصي لكل طالب (Enter للطالب التالي)، ويمكن تعديل الدرجة العظمى للتشخيصي.','درجات الاختبار الأول والثاني والثالث تُقرأ تلقائيًا من رصد الدرجات، ويظهر تقدّم كل طالب عن التشخيصي.','يُصنَّف الطلاب إلى: متفوقين، متوسطين، منخفضي التحصيل — وتُعدَّل الحدود من أعلى الصفحة (افتراضيًا 85% و 65%).','«📊 جميع المواد (تجميعي)» يعرض تحليل الصف في كل المواد معًا، وزر PDF لكل تحليل.']],
  ['📊','لوحة المتابعة',['مؤشرات: متوسط الإنجاز، اكتمال الرصد، الممتازون، ومن يحتاجون دعمًا.','رسوم: توزيع المستويات، الإنجاز في كل مادة، وترتيب الطلاب (اضغط الاسم لفتح ملفه).','خريطة الإنجاز تكشف نقاط القوة والضعف لكل طالب في كل مادة.']],
  ['🧑‍🎓','ملف الطالب والملاحظات',['اختر الطالب أو تنقّل بزرّي السابق والتالي.','ملاحظات ولي الأمر: ثلاث قوائم (الأداء، السلوك، التوصيات) ويمكن اختيار أكثر من ملاحظة في كل قائمة.','«ملء الملاحظات تلقائيًا» يقترح ملاحظات حسب مستوى كل طالب.']],
@@ -1123,19 +1123,19 @@ function freezeNames(){
 }
 /* ---------- written work follow-up: notebook, activities, workbook — once a month ---------- */
 const WK=['المذكرة','الأنشطة','كتاب التدريبات'];
-const WK_SYM={1:'✓',0:'✗'};
+const WK_SYM={1:'✓',2:'ناقص',0:'✗'};
 let wkSubj='',wkMonth=null;
 function wkMonthKey(){const ms=attMonths();if(wkMonth&&ms.find(x=>x.key===wkMonth))return wkMonth;wkMonth=curAttMonth();return wkMonth}
 function wkDefDate(M){const d=schoolDays(M.y,M.m).pop();return M.y+'-'+String(M.m).padStart(2,'0')+'-'+String(d?d.d:28).padStart(2,'0')}
 function wkGet(k,mk){S.wrk=S.wrk||{};const a=S.wrk[k]=S.wrk[k]||{};return a[mk]=a[mk]||{v:{}}}
-function wkStats(k,sid,keys){keys=keys||attMonths().map(x=>x.key);let y=0,n=0;keys.forEach(mk=>{const r=((((S.wrk||{})[k]||{})[mk]||{}).v||{})[sid]||[];r.forEach(x=>{if(x===1)y++;else if(x===0)n++})});return{y,n,pct:y+n?y/(y+n)*100:null}}
+function wkStats(k,sid,keys){keys=keys||attMonths().map(x=>x.key);let y=0,h=0,n=0;keys.forEach(mk=>{const r=((((S.wrk||{})[k]||{})[mk]||{}).v||{})[sid]||[];r.forEach(x=>{if(x===1)y++;else if(x===2)h++;else if(x===0)n++})});return{y,h,n,pct:y+h+n?(y+h*0.5)/(y+h+n)*100:null}}
 function wkSubjects(){return ACT().filter(s=>!s.part)}
 const wkDateTxt=iso=>{try{const[y,m,d]=iso.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.toLocaleDateString('ar-BH-u-nu-latn',{weekday:'long',day:'numeric',month:'long'})}catch(e){return iso}};
 function vWrk(v){
   const SS=wkSubjects();if(!wkSubj||!SS.find(x=>x.k===wkSubj))wkSubj=(SS.find(x=>x.k===curSubj)||SS[0]).k;
   const k=wkSubj,ms=attMonths(),mk=wkMonthKey(),M=ms.find(x=>x.key===mk),D=wkGet(k,mk),date=D.d||wkDefDate(M),ro=!canSubj(k);
   const pc=p=>p==null?'—':fmt(p,0)+'%';
-  const cls=(x)=>x===1?'wy':x===0?'wn':'we';
+  const cls=(x)=>x===1?'wy':x===2?'wh':x===0?'wn':'we';
   const colAll=i=>{const vals=S.roster.map(st=>((D.v||{})[st.id]||[])[i]);return vals.filter(x=>x===1).length};
   v.innerHTML=`<section class="home">
    <div class="hwel"><div><small>متابعة الأعمال الكتابية</small><h2>${esc(BY[k].n)} — ${esc(clsName())}</h2><p>متابعة شهرية واحدة في نهاية كل شهر: انتظام حل المذكرة والأنشطة وكتاب التدريبات</p></div>
@@ -1144,8 +1144,8 @@ function vWrk(v){
    <div class="mtabs" role="tablist" style="margin-top:12px">${ms.map(x=>{const dd=((((S.wrk||{})[k]||{})[x.key])||{});const has=Object.keys(dd.v||{}).length;return `<button class="tab${x.key===mk?'':' alt'}" data-wkm="${x.key}" aria-selected="${x.key===mk}">${x.full}${has?' ✓':''}</button>`}).join('')}</div>
    <div class="attbar"><label>📅 تاريخ المتابعة: <input type="date" id="wkDate" value="${date}" ${ro?'disabled':''}></label><span class="wkdt">${esc(wkDateTxt(date))}</span>
     ${ro?'':`<button class="btn" id="wkAllY" type="button">✓ الجميع منتظم</button><button class="btn ok" id="wkSave" type="button">💾 حفظ المتابعة</button>`}<span class="sp"></span>
-    <span class="leg2"><span class="wkb wy">✓</span> منتظم &nbsp; <span class="wkb wn">✗</span> غير منتظم &nbsp; <span class="wkb we"></span> لم يُتابع</span></div>
-   <p class="hint">اضغط الخانة: ✓ منتظم ← ✗ غير منتظم ← فارغ. زر «الكل» أعلى كل عمود يضع ✓ لكل من لم يُتابع في ذلك العمود.${ro?' <b>العرض للقراءة فقط.</b>':''}</p>
+    <span class="leg2"><span class="wkb wy">✓</span> منتظم &nbsp; <span class="wkb wh">ن</span> ناقص &nbsp; <span class="wkb wn">✗</span> غير منتظم &nbsp; <span class="wkb we"></span> لم يُتابع</span></div>
+   <p class="hint">اضغط الخانة: ✓ منتظم ← ناقص ← ✗ غير منتظم ← فارغ. (الناقص يُحسب نصف درجة في نسبة الانتظام) زر «الكل» أعلى كل عمود يضع ✓ لكل من لم يُتابع في ذلك العمود.${ro?' <b>العرض للقراءة فقط.</b>':''}</p>
    <div class="tw card" style="border-color:#2a6f97"><table class="wkt"><thead><tr><th>#</th><th class="nm">الطالب</th>${WK.map((w,i)=>`<th>${w}<small>${colAll(i)} / ${S.roster.length}</small>${ro?'':`<button type="button" class="wkcol" data-wkcol="${i}">✓ الكل</button>`}</th>`).join('')}<th>انتظام ${esc(M.n)}</th><th>انتظام الفصل</th></tr></thead><tbody>
    ${S.roster.map((st,i)=>{const r=(D.v||{})[st.id]||[];const m=wkStats(k,st.id,[mk]),t=wkStats(k,st.id);return `<tr data-sid="${st.id}"><td>${i+1}</td><td class="nm">${esc(st.name)}</td>${WK.map((_,j)=>`<td><button type="button" class="wkb ${cls(r[j])}" data-wk="${j}" ${ro?'disabled':''} aria-label="${esc(st.name)} ${WK[j]}">${WK_SYM[r[j]]||''}</button></td>`).join('')}<td class="pc">${pc(m.pct)}</td><td class="pc"><b>${pc(t.pct)}</b></td></tr>`}).join('')}
    </tbody></table></div></section>`;
@@ -1153,9 +1153,9 @@ function vWrk(v){
 function wkCell(btn){
   const k=wkSubj,mk=wkMonthKey(),D=wkGet(k,mk),sid=btn.closest('tr').dataset.sid,j=+btn.dataset.wk;
   if(!D.d){const M=attMonths().find(x=>x.key===mk);D.d=wkDefDate(M)}
-  const r=(D.v[sid]||[null,null,null]).slice();const cur=r[j];r[j]=cur===1?0:cur===0?null:1;
+  const r=(D.v[sid]||[null,null,null]).slice();const cur=r[j];r[j]=cur===1?2:cur===2?0:cur===0?null:1;
   if(r.every(x=>x==null))delete D.v[sid];else D.v[sid]=r;saveWrk();
-  btn.className='wkb '+(r[j]===1?'wy':r[j]===0?'wn':'we');btn.textContent=WK_SYM[r[j]]||'';
+  btn.className='wkb '+(r[j]===1?'wy':r[j]===2?'wh':r[j]===0?'wn':'we');btn.textContent=WK_SYM[r[j]]||'';
   const tr=btn.closest('tr'),pcs=tr.querySelectorAll('td.pc'),m=wkStats(k,sid,[mk]),t=wkStats(k,sid);pcs[0].textContent=m.pct==null?'—':fmt(m.pct,0)+'%';pcs[1].innerHTML='<b>'+(t.pct==null?'—':fmt(t.pct,0)+'%')+'</b>';
 }
 function wkSaveNow(){
@@ -1164,15 +1164,15 @@ function wkSaveNow(){
 }
 function wkSheet(term){
   const k=wkSubj,ms=attMonths(),mk=wkMonthKey(),M=ms.find(x=>x.key===mk),I=S.info,pc=p=>p==null?'—':fmt(p,0)+'%';
-  const td=x=>`<td class="${x===1?'aP':x===0?'aA':''}">${WK_SYM[x]||''}</td>`;
+  const td=x=>`<td class="${x===1?'aP':x===2?'aL':x===0?'aA':''}">${WK_SYM[x]||''}</td>`;
   const head=(t,info)=>`<div class="rp-hd"><img src="${LETTERHEAD}" alt=""></div><div class="rp-tb"><h1>${t}</h1><small>${esc(I.term||'')} <span dir="ltr">${esc(I.year||'')}</span></small></div><div class="sh-info"><span>الصف: <b>${esc(clsName())}</b></span><span>المادة: <b>${esc(BY[k].n)}</b></span>${S.ct?`<span>معلم الصف: <b>${esc(S.ct)}</b></span>`:''}<span>عدد الطلاب: <b>${S.roster.length}</b></span>${info||''}</div>`;
   if(!term){const D=wkGet(k,mk),date=D.d||wkDefDate(M);
     return head('متابعة الأعمال الكتابية — '+M.full,`<span>تاريخ المتابعة: <b>${esc(wkDateTxt(date))} <span dir="ltr">${date}</span></b></span>`)+`<table class="sh" style="margin-top:8px"><thead><tr><th>#</th><th class="nm">اسم الطالب</th>${WK.map(w=>`<th>${w}</th>`).join('')}<th>انتظام الشهر</th><th>انتظام الفصل</th></tr></thead><tbody>
     ${S.roster.map((st,i)=>{const r=(D.v||{})[st.id]||[];return `<tr><td>${i+1}</td><td class="nm">${esc(st.name)}</td>${WK.map((_,j)=>td(r[j])).join('')}<td class="tot">${pc(wkStats(k,st.id,[mk]).pct)}</td><td class="tot">${pc(wkStats(k,st.id).pct)}</td></tr>`}).join('')}</tbody></table>
-    <div class="sh-leg">✓ منتظم · ✗ غير منتظم · الخانة الفارغة = لم يُتابع</div>`+shSig()}
+    <div class="sh-leg">✓ منتظم · ناقص (نصف درجة) · ✗ غير منتظم · الخانة الفارغة = لم يُتابع</div>`+shSig()}
   return head('ملخص متابعة الأعمال الكتابية للفصل الدراسي')+`<table class="sh" style="margin-top:8px"><thead><tr><th rowspan="2">#</th><th rowspan="2" class="nm">اسم الطالب</th>${ms.map(m=>{const dd=(((S.wrk||{})[k]||{})[m.key]||{}).d;return `<th colspan="3" class="g">${m.full}${dd?`<small dir="ltr">${dd}</small>`:''}</th>`}).join('')}<th rowspan="2">الانتظام</th></tr><tr>${ms.map(()=>'<th>مذكرة</th><th>أنشطة</th><th>تدريبات</th>').join('')}</tr></thead><tbody>
    ${S.roster.map((st,i)=>`<tr><td>${i+1}</td><td class="nm">${esc(st.name)}</td>${ms.map(m=>{const r=(((((S.wrk||{})[k]||{})[m.key]||{}).v)||{})[st.id]||[];return WK.map((_,j)=>td(r[j])).join('')}).join('')}<td class="tot">${pc(wkStats(k,st.id).pct)}</td></tr>`).join('')}</tbody></table>
-   <div class="sh-leg">✓ منتظم · ✗ غير منتظم · الخانة الفارغة = لم يُتابع</div>`+shSig();
+   <div class="sh-leg">✓ منتظم · ناقص (نصف درجة) · ✗ غير منتظم · الخانة الفارغة = لم يُتابع</div>`+shSig();
 }
 /* ---------- test analysis: diagnostic + tests 1-3, three achievement groups ---------- */
 const ANCATS=[['top','متفوقون','#1f9d55','#e8f5ee'],['mid','متوسطون','#c98a00','#fdf5df'],['low','منخفضو التحصيل','#d64545','#fcecec']];
