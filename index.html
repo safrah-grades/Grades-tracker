@@ -575,13 +575,14 @@ SUBJ.forEach((s,si)=>{s.ci=si%7;let idx=0,total=0;s.groups.forEach(g=>{
   g.raw=g.items.reduce((t,it)=>t+it.max,0);
   if(g.max==null)g.max=g.raw;g.f=g.max/g.raw;total+=g.max});
   s.n_items=idx;s.max=total;BY[s.k]=s});
-function on(k){return !((S.info.off||[]).includes(k))}
+const AR_ONLY=false;
+function on(k){if(AR_ONLY)return k==='ara';return !((S.info.off||[]).includes(k))}
 function ACT(){return SUBJ.filter(s=>on(s.k))}
 function CNT(){return SUBJ.filter(s=>!s.part&&on(s.k))}
 
 /* ---------- state ---------- */
 const DEF_INFO={cls:'السادس',sec:'',teacher:'أ. خالد الحمري',principal:'أ. حمود أحمد علي بن علي',term:'الفصل الدراسي الأول',year:'2026-2027',bands:[90,80,70,50],off:[],step:1,plusEmpty:'one',rep:{avg:true,rank:true,items:true,note:true,att:true},pin:'1234',lock:false};
-const CLASSES=[['p1-1','الأول الابتدائي / 1'],['p2-1','الثاني الابتدائي / 1'],['p3-1','الثالث الابتدائي / 1'],['p4-1','الرابع الابتدائي / 1'],['p4-2','الرابع الابتدائي / 2'],['p5-1','الخامس الابتدائي / 1'],['p6-1','السادس الابتدائي / 1'],['m1-1','الأول الإعدادي / 1'],['m1-2','الأول الإعدادي / 2'],['m2-1','الثاني الإعدادي / 1'],['m2-2','الثاني الإعدادي / 2'],['m3-1','الثالث الإعدادي / 1'],['m3-2','الثالث الإعدادي / 2']].map(([id,n])=>({id,n}));
+const CLASSES=[['p1-1','الأول الابتدائي / 1'],['p2-1','الثاني الابتدائي / 1'],['p3-1','الثالث الابتدائي / 1'],['p4-1','الرابع الابتدائي / 1'],['p4-2','الرابع الابتدائي / 2'],['p5-1','الخامس الابتدائي / 1'],['p6-1','السادس الابتدائي / 1'],['m1-1','الأول الإعدادي / 1'],['m1-2','الأول الإعدادي / 2'],['m2-1','الثاني الإعدادي / 1'],['m2-2','الثاني الإعدادي / 2'],['m3-1','الثالث الإعدادي / 1'],['m3-2','الثالث الإعدادي / 2']].map(([id,n])=>({id,n})).filter(c=>!AR_ONLY||!/^p[123]-/.test(c.id));
 const CLS={};CLASSES.forEach(c=>CLS[c.id]=c);
 let curCls='p6-1';try{const c=localStorage.getItem('grades-cls');if(c&&CLS[c])curCls=c}catch(e){}
 const clsName=c=>CLS[c||curCls].n;
@@ -773,12 +774,13 @@ async function assignSubject(k,uid,quiet){
 
 /* ---------- GitHub sync (when the page runs on GitHub Pages, outside Claude) ---------- */
 const GHK='grades-gh';
-let gh=(()=>{try{return JSON.parse(localStorage.getItem(GHK))||{}}catch(e){return{}}})();
+let gh=(()=>{try{return JSON.parse(localStorage.getItem(GHK))||(AR_ONLY&&JSON.parse(localStorage.getItem('grades-gh')))||{}}catch(e){return{}}})();
+const GH_FILE=AR_ONLY?'arabic.json':'data.json';
 let ghSha=null,ghBusy=false,ghTimer=0,ghDirty=new Set(),ghLast='',ghErr='';
 const ghReady=()=>!!(gh.owner&&gh.repo&&gh.token);
-gh.path='data.json';delete gh.branch;
+gh.path=GH_FILE;delete gh.branch;
 const ghRepoUrl=()=>`https://api.github.com/repos/${encodeURIComponent(gh.owner)}/${encodeURIComponent(gh.repo)}`;
-const ghUrl=()=>ghRepoUrl()+'/contents/data.json';
+const ghUrl=()=>ghRepoUrl()+'/contents/'+GH_FILE;
 const ghHead=()=>({Authorization:'Bearer '+gh.token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'});
 const b64e=str=>{const u=new TextEncoder().encode(str);let t='';for(let i=0;i<u.length;i+=8192)t+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(t)};
 const b64d=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g,'')),c=>c.charCodeAt(0)));
@@ -847,7 +849,7 @@ async function ghClick(id){
     const tk=($('#ghToken').value||'').replace(/\s+/g,'');
     const rv=($('#ghRepo').value||'').trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\.git$/,'').replace(/\/+$/,'');
     const pr=rv.split('/').filter(Boolean);
-    gh={owner:pr.length>1?pr[0]:'khaledalhamri93-stack',repo:pr.length>1?pr[1]:(pr[0]||'Grades-data'),path:'data.json',token:tk||gh.token||''};
+    gh={owner:pr.length>1?pr[0]:'khaledalhamri93-stack',repo:pr.length>1?pr[1]:(pr[0]||'Grades-data'),path:GH_FILE,token:tk||gh.token||''};
     try{localStorage.setItem(GHK,JSON.stringify(gh))}catch(e){}
     if(!ghReady()){ghStatus('أكمل اسم المستودع والمفتاح',true);return true}
     ghStatus('جارٍ الاختبار…');ghSha=null;
@@ -942,6 +944,7 @@ function renderHeader(){
 
 /* ---------- subject switcher ---------- */
 function renderScopeBar(){
+  if(AR_ONLY){$('#scopeBar').hidden=true;scope='ara';curSubj='ara';return}
   const b=$('#scopeBar'),show=tab==='dash'||tab==='entry'||tab==='prof';b.hidden=!show;if(!show)return;
   if(scope!=='all'&&!on(scope))scope='all';if(!on(curSubj))curSubj=(ACT()[0]||SUBJ[0]).k;
   const act=tab==='entry'?curSubj:scope;
@@ -989,7 +992,7 @@ function vHome(v){
     ${canSet?tile('set','⚙️','الإعدادات','المعلمون والمواد والربط وكلمة السر','🔒','t6'):''}
     ${tile('help','📘','دليل الاستخدام','شرح مختصر والدليل المصوّر PDF',null,'t8')}
    </div>
-   ${mySubs.length?`<div class="qhd"><h3 class="hsec">${mode==='db'&&!canWrite?'موادي':'الدخول السريع لرصد مادة'}</h3><span class="qarr"><button type="button" data-qsc="1" aria-label="السابق">›</button><button type="button" data-qsc="-1" aria-label="التالي">‹</button></span></div><div class="qsubs">${mySubs.map(x=>{const p=classStats(x.k);return `<button type="button" class="qs c${x.ci}" data-nav="entry" data-sub="${x.k}"><b>${esc(x.n)}</b><small>${pctS(p.comp*100)} مرصود · متوسط ${pctS(p.avg)}</small></button>`}).join('')}</div>`:''}
+   ${mySubs.length&&!AR_ONLY?`<div class="qhd"><h3 class="hsec">${mode==='db'&&!canWrite?'موادي':'الدخول السريع لرصد مادة'}</h3><span class="qarr"><button type="button" data-qsc="1" aria-label="السابق">›</button><button type="button" data-qsc="-1" aria-label="التالي">‹</button></span></div><div class="qsubs">${mySubs.map(x=>{const p=classStats(x.k);return `<button type="button" class="qs c${x.ci}" data-nav="entry" data-sub="${x.k}"><b>${esc(x.n)}</b><small>${pctS(p.comp*100)} مرصود · متوسط ${pctS(p.avg)}</small></button>`}).join('')}</div>`:''}
   </section>`;
 }
 /* ---------- in-app user guide ---------- */
@@ -1666,7 +1669,7 @@ function vSet(v){
     <label>مدير المدرسة<input type="text" id="iPrin" data-k="principal" value="${esc(I.principal)}" ${ro}></label>
     <label>الفصل الدراسي<input type="text" id="iTerm" data-k="term" value="${esc(I.term)}" ${ro}></label>
     <label>العام الدراسي<input type="text" id="iYear" data-k="year" value="${esc(I.year)}" ${ro}></label></div>`)}
-  ${box('o','📚 المواد المعروضة','المادة المُلغاة تختفي من القوائم واللوحات والتقارير، وتبقى درجاتها محفوظة',`<div class="opts">${SUBJ.map(x=>chk('off-'+x.k,`data-off="${x.k}"`,on(x.k),esc(x.n),x.part?'ضمن التربية الإسلامية':'')).join('')}</div>
+  ${AR_ONLY?'':box('o','📚 المواد المعروضة','المادة المُلغاة تختفي من القوائم واللوحات والتقارير، وتبقى درجاتها محفوظة',`<div class="opts">${SUBJ.map(x=>chk('off-'+x.k,`data-off="${x.k}"`,on(x.k),esc(x.n),x.part?'ضمن التربية الإسلامية':'')).join('')}</div>
     <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><button class="btn w sm" id="offAll" type="button" ${ro}>تفعيل الكل</button><button class="btn w sm" id="offAra" type="button" ${ro}>اللغة العربية فقط</button></div>`)}
   ${box('o wide','👩‍🏫 المعلمون والمواد','قائمة المعلمين ومواد كل معلم — كل معلم يعدّل مادته فقط',staffCard(ro))}
   ${box('','✏️ رصد الدرجات','زرّا + و − وحماية الجدول',`<div class="set">
