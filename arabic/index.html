@@ -490,7 +490,7 @@ table.ttg td{background:var(--soft);border-radius:8px;height:62px;padding:3px;ve
     <button class="tab" role="tab" data-t="att" aria-selected="false">🗓️ الحضور والغياب</button>
     <button class="tab" role="tab" data-t="prof" aria-selected="false">🧑‍🎓 ملف الطالب</button>
     <button class="tab" role="tab" data-t="studs" aria-selected="false">👥 الطلاب</button>
-    <button class="tab" role="tab" data-t="anal" aria-selected="false">📈 تحليل الاختبارات</button>
+    <button class="tab" role="tab" data-t="anal" aria-selected="false">📈 تحليل الدرجات والتصنيف</button>
     <button class="tab" role="tab" data-t="staff" aria-selected="false">🗓️ جدول المعلمين</button>
     <button class="tab" role="tab" data-t="set" aria-selected="false">⚙️ الإعدادات</button>
     <button class="tab" role="tab" data-t="help" aria-selected="false">📘 دليل الاستخدام</button>
@@ -987,7 +987,7 @@ function vHome(v){
     ${tile('dash','📊','لوحة المتابعة','نسب الإنجاز والرسوم البيانية وترتيب الطلاب',pctS(c.avg)+' متوسط','t3')}
     ${tile('prof','🧑‍🎓','ملف الطالب وتقرير ولي الأمر','درجات كل طالب وملاحظاتك وتقرير PDF',n+' طالبًا','t4')}
     ${canSet?tile('studs','👥','الطلاب','إضافة أو حذف أو استيراد الأسماء',n+' طالبًا','t5'):''}
-    ${tile('anal','📈','تحليل الاختبارات','التشخيصي والاختبارات وتصنيف الطلاب لثلاث فئات',null,'t9')}
+    ${tile('anal','📈','تحليل الدرجات والتصنيف','التشخيصي والاختبارات وتصنيف الطلاب: متفوقون، متوسطون، منخفضو التحصيل',null,'t9')}
     ${tile('staff','🗓️','جدول المعلمين','حصص كل معلم وجدول كل صف أسبوعيًا',(S.staff||[]).length+' معلمًا','t7')}
     ${canSet?tile('set','⚙️','الإعدادات','المعلمون والمواد والربط وكلمة السر','🔒','t6'):''}
     ${tile('help','📘','دليل الاستخدام','شرح مختصر والدليل المصوّر PDF',null,'t8')}
@@ -1001,7 +1001,7 @@ const HELP=[
  ['☰','التنقل واختيار الصف والمادة',['زر الخطوط الثلاثة أعلى اليمين يفتح قائمة كل الصفحات.','اختر اسمك من قائمة «👨‍🏫 المعلم» فتظهر مستطيلات صفوفك، واضغط المستطيل للدخول إلى الصف ومادتك (أو اختر «المعلمين» لعرض كل الصفوف).','«📚 المادة»: «كل المواد» للإنجاز الكلي أو مادة واحدة لعرض لوحتها وتقاريرها.']],
  ['✏️','رصد الدرجات',['اختر المادة، ثم استخدم + لرفع الدرجة و− لخفضها، أو اكتبها مباشرة.','اضغط Enter للانتقال إلى الطالب التالي، أو الأسهم ↑ ↓.','الخانة الحمراء = درجة أكبر من الحد الأعلى ولن تُحفظ. اترك الخانة فارغة إن لم يُقيَّم الطالب.','الحفظ تلقائي مع كل تعديل.','زر «📄 تنزيل المتابعات والمهام PDF» يُخرج كشف المادة كاملًا بعناصرها ومجاميعها.']],
  ['🗓️','الحضور والغياب',['اختر الشهر من التبويبات (سبتمبر – يناير).','اختر اليوم ثم اضغط «✓ تسجيل جميع الطلاب حضورًا»، ثم عدّل الغائبين فقط.','زر «💾 حفظ الغياب» يحفظ ويرفع الغياب فورًا، و«📄 كشف الشهر PDF» و«📄 ملخص الفصل PDF» لتنزيل كشوف الغياب.','كل ضغطة على الخانة: حاضر ← غائب ← متأخر ← بعذر ← فارغ. وزر ⊘ تحت اليوم يجعله عطلة.']],
- ['📈','تحليل الاختبارات',['اختر المادة، واكتب درجة الاختبار التشخيصي لكل طالب (Enter للطالب التالي)، ويمكن تعديل الدرجة العظمى للتشخيصي.','درجات الاختبار الأول والثاني والثالث تُقرأ تلقائيًا من رصد الدرجات، ويظهر تقدّم كل طالب عن التشخيصي.','يُصنَّف الطلاب إلى: متفوقين، متوسطين، منخفضي التحصيل — وتُعدَّل الحدود من أعلى الصفحة (افتراضيًا 85% و 65%).','«📊 جميع المواد (تجميعي)» يعرض تحليل الصف في كل المواد معًا، وزر PDF لكل تحليل.']],
+ ['📈','تحليل الدرجات والتصنيف',['«أساس التصنيف»: متوسط الاختبارات، أو الدرجة الكلية للمادة بكل عناصر تقييمها.','اختر المادة، واكتب درجة الاختبار التشخيصي لكل طالب (Enter للطالب التالي)، ويمكن تعديل الدرجة العظمى للتشخيصي.','درجات الاختبار الأول والثاني والثالث تُقرأ تلقائيًا من رصد الدرجات، ويظهر تقدّم كل طالب عن التشخيصي.','يُصنَّف الطلاب إلى: متفوقين، متوسطين، منخفضي التحصيل — وتُعدَّل الحدود من أعلى الصفحة (افتراضيًا 85% و 65%).','«📊 جميع المواد (تجميعي)» يعرض تحليل الصف في كل المواد معًا، وزر PDF لكل تحليل.']],
  ['📊','لوحة المتابعة',['مؤشرات: متوسط الإنجاز، اكتمال الرصد، الممتازون، ومن يحتاجون دعمًا.','رسوم: توزيع المستويات، الإنجاز في كل مادة، وترتيب الطلاب (اضغط الاسم لفتح ملفه).','خريطة الإنجاز تكشف نقاط القوة والضعف لكل طالب في كل مادة.']],
  ['🧑‍🎓','ملف الطالب والملاحظات',['اختر الطالب أو تنقّل بزرّي السابق والتالي.','ملاحظات ولي الأمر: ثلاث قوائم (الأداء، السلوك، التوصيات) ويمكن اختيار أكثر من ملاحظة في كل قائمة.','«ملء الملاحظات تلقائيًا» يقترح ملاحظات حسب مستوى كل طالب.']],
  ['📄','التقارير',['«تقرير ولي الأمر PDF» في ملف الطالب يُخرج تقريره المصوّر.','«تقارير PDF لكل الطلاب» يُخرج ملفًا واحدًا لكل طلاب الصف.','«تصدير ملف Excel» يُخرج ملف السجل الرسمي معبأً بالدرجات.','اختر مادة من قائمة 📚 قبل التصدير لتقرير تلك المادة فقط.']],
@@ -1105,9 +1105,9 @@ function anRow(k,sid){
   const T=anTests(k),arr=(S.marks[k]||{})[sid]||[],dm=anDiagMax(k),dv=(((S.diag||{})[k]||{}).v||{})[sid];
   const tp=T.map(it=>{const v=arr[it.i];return typeof v==='number'?v/it.max*100:null});
   const got=tp.filter(x=>x!=null),avg=got.length?got.reduce((a,b)=>a+b,0)/got.length:null;
-  const dp=typeof dv==='number'?dv/dm*100:null,base=avg!=null?avg:dp;
+  const dp=typeof dv==='number'?dv/dm*100:null,tot=subjStats(k,sid).pct,base=S.info.anb==='total'?(tot!=null?tot:dp):(avg!=null?avg:dp);
   const [hi,lo]=anCut(),cat=base==null?null:base>=hi?0:base>=lo?1:2;
-  return{dv,dp,tp,avg,cat,chg:avg!=null&&dp!=null?avg-dp:null};
+  return{dv,dp,tp,avg,tot,base,cat,chg:avg!=null&&dp!=null?avg-dp:null};
 }
 function anStats(k){
   const rows=S.roster.map(st=>({st,r:anRow(k,st.id)}));
@@ -1119,7 +1119,7 @@ function anStats(k){
 }
 function anAll(){
   const SS=anSubjects(),[hi,lo]=anCut(),cat=p=>p==null?null:p>=hi?0:p>=lo?1:2;
-  const rows=S.roster.map(st=>{const per={};SS.forEach(x=>{const r=anRow(x.k,st.id);per[x.k]=r.avg!=null?r.avg:r.dp});const v=Object.values(per).filter(x=>x!=null);const avg=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;return{st,per,avg,cat:cat(avg)}});
+  const rows=S.roster.map(st=>{const per={};SS.forEach(x=>{const r=anRow(x.k,st.id);per[x.k]=r.base});const v=Object.values(per).filter(x=>x!=null);const avg=v.length?v.reduce((a,b)=>a+b,0)/v.length:null;return{st,per,avg,cat:cat(avg)}});
   const subj=SS.map(x=>{const vals=rows.map(r=>r.per[x.k]);const g=vals.filter(v=>v!=null);return{s:x,cnt:[0,1,2].map(i=>vals.filter(v=>cat(v)===i).length),none:vals.filter(v=>v==null).length,mean:g.length?g.reduce((a,b)=>a+b,0)/g.length:null}});
   return{SS,rows,subj,cnt:[0,1,2].map(i=>rows.filter(r=>r.cat===i).length),none:rows.filter(r=>r.cat==null).length};
 }
@@ -1130,6 +1130,7 @@ function vAnalAll(v,SS){
   v.innerHTML=`<section class="home">
    <div class="hwel"><div><small>تحليل تجميعي</small><h2>جميع المواد — ${esc(clsName())}</h2><p>نسبة كل طالب في كل مادة = متوسط اختباراتها المرصودة (أو التشخيصي إن لم تُرصد)، والفئة العامة حسب متوسط المواد</p></div>
     <div class="anbar"><label>📚 المادة: <select id="anSel"><option value="all" selected>📊 جميع المواد (تجميعي)</option>${SS.map(x=>`<option value="${x.k}">${esc(x.n)}</option>`).join('')}</select></label>
+     <label>أساس التصنيف: <select id="anB"><option value="tests"${S.info.anb==='total'?'':' selected'}>متوسط الاختبارات</option><option value="total"${S.info.anb==='total'?' selected':''}>الدرجة الكلية للمادة</option></select></label>
      <label>متفوق من <input type="number" id="anHi" value="${hi}" min="1" max="100" ${canWrite?'':'disabled'}>%</label><label>متوسط من <input type="number" id="anLo" value="${lo}" min="0" max="99" ${canWrite?'':'disabled'}>%</label>
      <button class="btn w" id="anPdf" type="button">📄 التحليل التجميعي PDF</button></div></div>
    <div class="kpis">${ANCATS.map((c,i)=>`<div class="kpi" style="--kc:${c[2]};--kl:${c[3]}"><span>${c[1]} (عام)</span><b>${A_.cnt[i]}</b><small>${S.roster.length?fmt(A_.cnt[i]/S.roster.length*100,0)+'% من الصف':''}</small></div>`).join('')}<div class="kpi" style="--kc:#8792a0;--kl:#f3f5f8"><span>لم يُرصد بعد</span><b>${A_.none}</b></div></div>
@@ -1156,8 +1157,9 @@ function vAnal(v){
   const pc=p=>p==null?'—':fmt(p,0)+'%';
   const labels=['التشخيصي',...A_.T.map(it=>it.l)];
   v.innerHTML=`<section class="home">
-   <div class="hwel"><div><small>تحليل نتائج الاختبارات</small><h2>${esc(s.n)} — ${esc(clsName())}</h2><p>التصنيف حسب متوسط الاختبارات المرصودة (وقبلها حسب الاختبار التشخيصي)</p></div>
+   <div class="hwel"><div><small>تحليل الدرجات والتصنيف</small><h2>${esc(s.n)} — ${esc(clsName())}</h2><p>${S.info.anb==='total'?'التصنيف حسب الدرجة الكلية للمادة (كل عناصر التقييم المرصودة)':'التصنيف حسب متوسط الاختبارات المرصودة (وقبلها حسب الاختبار التشخيصي)'}</p></div>
     <div class="anbar"><label>📚 المادة: <select id="anSel"><option value="all">📊 جميع المواد (تجميعي)</option>${SS.map(x=>`<option value="${x.k}"${x.k===k?' selected':''}>${esc(x.n)}</option>`).join('')}</select></label>
+     <label>أساس التصنيف: <select id="anB"><option value="tests"${S.info.anb==='total'?'':' selected'}>متوسط الاختبارات</option><option value="total"${S.info.anb==='total'?' selected':''}>الدرجة الكلية للمادة</option></select></label>
      <label>متفوق من <input type="number" id="anHi" value="${hi}" min="1" max="100" ${canWrite?'':'disabled'}>%</label><label>متوسط من <input type="number" id="anLo" value="${lo}" min="0" max="99" ${canWrite?'':'disabled'}>%</label>
      <button class="btn w" id="anPdf" type="button">📄 تقرير التحليل PDF</button></div></div>
    <div class="kpis">${ANCATS.map((c,i)=>`<div class="kpi" style="--kc:${c[2]};--kl:${c[3]}"><span>${c[1]}</span><b>${A_.cnt[i]}</b><small>${S.roster.length?fmt(A_.cnt[i]/S.roster.length*100,0)+'% من الصف':''}</small></div>`).join('')}<div class="kpi" style="--kc:#8792a0;--kl:#f3f5f8"><span>لم يُرصد بعد</span><b>${A_.none}</b></div></div>
@@ -1165,14 +1167,14 @@ function vAnal(v){
     <div class="card"><div class="ch"><h3>توزيع الفئات في كل اختبار</h3><small>عدد الطلاب</small></div><div class="cb"><div style="height:240px"><canvas id="anC2"></canvas></div></div></div></div>
    <h3 class="hsec">درجات الطلاب وتصنيفهم</h3>
    <p class="hint">اكتب درجة <b>الاختبار التشخيصي</b> لكل طالب (من <input type="number" id="anMax" value="${dm}" min="1" max="100" style="width:64px" ${ro?'disabled':''}>). درجات الاختبارات الأخرى تُقرأ تلقائيًا من رصد الدرجات.${ro?' <b>العرض للقراءة فقط.</b>':''}</p>
-   <div class="tw card"><table class="an"><thead><tr><th>#</th><th class="nm">الطالب</th><th>التشخيصي<small>من ${dm}</small></th>${A_.T.map(it=>`<th>${esc(it.l)}<small>من ${it.max}</small></th>`).join('')}<th>متوسط الاختبارات</th><th>التقدّم عن التشخيصي</th><th>الفئة</th></tr></thead><tbody>
+   <div class="tw card"><table class="an"><thead><tr><th>#</th><th class="nm">الطالب</th><th>التشخيصي<small>من ${dm}</small></th>${A_.T.map(it=>`<th>${esc(it.l)}<small>من ${it.max}</small></th>`).join('')}<th>متوسط الاختبارات</th><th>الدرجة الكلية</th><th>التقدّم عن التشخيصي</th><th>الفئة</th></tr></thead><tbody>
    ${A_.rows.map((x,i)=>{const r=x.r,arr=(S.marks[k]||{})[x.st.id]||[];return `<tr data-sid="${x.st.id}"><td>${i+1}</td><td class="nm">${esc(x.st.name)}</td>
      <td><input class="dg" type="text" inputmode="decimal" data-dg="${x.st.id}" value="${r.dv==null?'':r.dv}" ${ro?'disabled':''} aria-label="التشخيصي ${esc(x.st.name)}"><div class="mini">${pc(r.dp)}</div></td>
      ${A_.T.map((it,j)=>{const v=arr[it.i];return `<td><b>${typeof v==='number'?fmt(v):'—'}</b><div class="mini">${pc(r.tp[j])}</div></td>`}).join('')}
-     <td><b>${pc(r.avg)}</b></td><td>${r.chg==null?'—':`<b style="color:${r.chg>=0?'#1f9d55':'#d64545'}">${r.chg>=0?'▲ +':'▼ '}${fmt(r.chg,0)}</b>`}</td><td>${chip(r.cat)}</td></tr>`}).join('')}
+     <td><b>${pc(r.avg)}</b></td><td>${pc(r.tot)}</td><td>${r.chg==null?'—':`<b style="color:${r.chg>=0?'#1f9d55':'#d64545'}">${r.chg>=0?'▲ +':'▼ '}${fmt(r.chg,0)}</b>`}</td><td>${chip(r.cat)}</td></tr>`}).join('')}
    </tbody></table></div>
    <h3 class="hsec">قوائم الفئات</h3>
-   <div class="catl">${ANCATS.map((c,i)=>`<div class="card" style="border-top:4px solid ${c[2]}"><div class="ch"><h3 style="color:${c[2]}">${c[1]} (${A_.cnt[i]})</h3></div><div class="cb"><ol>${A_.rows.filter(x=>x.r.cat===i).sort((a,b)=>(b.r.avg??b.r.dp??0)-(a.r.avg??a.r.dp??0)).map(x=>`<li>${esc(x.st.name)} <small>${pc(x.r.avg??x.r.dp)}</small></li>`).join('')||'<li class="mut">—</li>'}</ol></div></div>`).join('')}</div>
+   <div class="catl">${ANCATS.map((c,i)=>`<div class="card" style="border-top:4px solid ${c[2]}"><div class="ch"><h3 style="color:${c[2]}">${c[1]} (${A_.cnt[i]})</h3></div><div class="cb"><ol>${A_.rows.filter(x=>x.r.cat===i).sort((a,b)=>(b.r.base??0)-(a.r.base??0)).map(x=>`<li>${esc(x.st.name)} <small>${pc(x.r.base)}</small></li>`).join('')||'<li class="mut">—</li>'}</ol></div></div>`).join('')}</div>
   </section>`;
   const m=A_.means;
   charts.an1=new Chart($('#anC1'),{type:'bar',data:{labels,datasets:[{data:m.map(x=>x==null?0:+fmt(x)),backgroundColor:m.map((x,i)=>i===0?'#8792a0':lvColor(x)),borderRadius:6,maxBarThickness:48}]},
@@ -1202,11 +1204,11 @@ function anPdfBody(){
   if(anSubj==='all')return anPdfAll();
   const k=anSubj,s=BY[k],A_=anStats(k),[hi,lo]=anCut(),dm=anDiagMax(k),pc=p=>p==null?'—':fmt(p,0)+'%';
   const I=S.info;
-  return `<div class="rp-hd"><img src="${LETTERHEAD}" alt=""></div><div class="rp-tb"><h1>تحليل نتائج الاختبارات — ${esc(s.n)}</h1><small>${esc(I.term||'')} <span dir="ltr">${esc(I.year||'')}</span></small></div>
-  <div class="sh-info"><span>الصف: <b>${esc(clsName())}</b></span><span>عدد الطلاب: <b>${S.roster.length}</b></span>${ANCATS.map((c,i)=>`<span>${c[1]}: <b>${A_.cnt[i]}</b></span>`).join('')}<span>الحدود: متفوق ≥ ${hi}% · متوسط ${lo}–${hi-1}% · منخفض &lt; ${lo}%</span></div>
-  <table class="sh" style="margin-top:8px"><thead><tr><th>#</th><th class="nm">اسم الطالب</th><th>التشخيصي<small>من ${dm}</small></th>${A_.T.map(it=>`<th>${esc(it.l)}<small>من ${it.max}</small></th>`).join('')}<th>متوسط الاختبارات</th><th>التقدّم</th><th>الفئة</th></tr></thead><tbody>
-  ${A_.rows.map((x,i)=>{const r=x.r,arr=(S.marks[k]||{})[x.st.id]||[];return `<tr><td>${i+1}</td><td class="nm">${esc(x.st.name)}</td><td>${r.dv==null?'':fmt(r.dv)}</td>${A_.T.map(it=>{const v=arr[it.i];return `<td>${typeof v==='number'?fmt(v):''}</td>`}).join('')}<td class="tot">${pc(r.avg)}</td><td>${r.chg==null?'':(r.chg>=0?'+':'')+fmt(r.chg,0)}</td><td style="font-weight:800;color:${r.cat==null?'#5d6b78':ANCATS[r.cat][2]}">${r.cat==null?'—':ANCATS[r.cat][1]}</td></tr>`}).join('')}
-  </tbody><tfoot><tr><td></td><td class="nm"><b>متوسط الصف</b></td>${A_.means.map(x=>`<td class="tot">${pc(x)}</td>`).join('')}<td colspan="3"></td></tr></tfoot></table>
+  return `<div class="rp-hd"><img src="${LETTERHEAD}" alt=""></div><div class="rp-tb"><h1>تحليل الدرجات والتصنيف — ${esc(s.n)}</h1><small>${esc(I.term||'')} <span dir="ltr">${esc(I.year||'')}</span></small></div>
+  <div class="sh-info"><span>الصف: <b>${esc(clsName())}</b></span><span>عدد الطلاب: <b>${S.roster.length}</b></span>${ANCATS.map((c,i)=>`<span>${c[1]}: <b>${A_.cnt[i]}</b></span>`).join('')}<span>الحدود: متفوق ≥ ${hi}% · متوسط ${lo}–${hi-1}% · منخفض &lt; ${lo}%</span><span>أساس التصنيف: <b>${S.info.anb==='total'?'الدرجة الكلية':'متوسط الاختبارات'}</b></span></div>
+  <table class="sh" style="margin-top:8px"><thead><tr><th>#</th><th class="nm">اسم الطالب</th><th>التشخيصي<small>من ${dm}</small></th>${A_.T.map(it=>`<th>${esc(it.l)}<small>من ${it.max}</small></th>`).join('')}<th>متوسط الاختبارات</th><th>الدرجة الكلية</th><th>التقدّم</th><th>الفئة</th></tr></thead><tbody>
+  ${A_.rows.map((x,i)=>{const r=x.r,arr=(S.marks[k]||{})[x.st.id]||[];return `<tr><td>${i+1}</td><td class="nm">${esc(x.st.name)}</td><td>${r.dv==null?'':fmt(r.dv)}</td>${A_.T.map(it=>{const v=arr[it.i];return `<td>${typeof v==='number'?fmt(v):''}</td>`}).join('')}<td class="tot">${pc(r.avg)}</td><td>${pc(r.tot)}</td><td>${r.chg==null?'':(r.chg>=0?'+':'')+fmt(r.chg,0)}</td><td style="font-weight:800;color:${r.cat==null?'#5d6b78':ANCATS[r.cat][2]}">${r.cat==null?'—':ANCATS[r.cat][1]}</td></tr>`}).join('')}
+  </tbody><tfoot><tr><td></td><td class="nm"><b>متوسط الصف</b></td>${A_.means.map(x=>`<td class="tot">${pc(x)}</td>`).join('')}<td colspan="4"></td></tr></tfoot></table>
   <div class="rp-two" style="margin-top:10px;align-items:start">${ANCATS.map((c,i)=>`<div><h2 style="color:${c[2]}">${c[1]} (${A_.cnt[i]})</h2><div style="font-size:12px;line-height:1.8">${A_.rows.filter(x=>x.r.cat===i).map(x=>esc(x.st.name)).join('، ')||'—'}</div></div>`).join('')}</div>`+shSig();
 }
 function vDash(v){
@@ -2116,7 +2118,7 @@ document.addEventListener('click',e=>{
   if(t.dataset.stt){stSel=t.dataset.stt;stView='t';tab='staff';render();window.scrollTo({top:0});return}
   if(t.dataset.stc){stCls=t.dataset.stc;stView='c';tab='staff';render();window.scrollTo({top:0});return}
   if(t.id==='stPdf'){const nm=stView==='c'?'جدول حصص '+clsShort(stCls):'جدول حصص '+(((S.staff||[]).find(x=>x.id===stSel)||{}).name||'');sheetPDF(t,nm,ttPdfBody(),true);return}
-  if(t.id==='anPdf'){sheetPDF(t,'تحليل الاختبارات - '+(anSubj==='all'?'جميع المواد':BY[anSubj].n)+' - '+clsName(),anPdfBody(),true);return}
+  if(t.id==='anPdf'){sheetPDF(t,'تحليل الدرجات والتصنيف - '+(anSubj==='all'?'جميع المواد':BY[anSubj].n)+' - '+clsName(),anPdfBody(),true);return}
   if(t.dataset.ansub){anSubj=t.dataset.ansub;render();window.scrollTo({top:0});return}
   if(t.id==='attAllGo'){attAllPresent();return}
   if(t.id==='attSaveGo'){attSaveNow();return}
@@ -2156,7 +2158,7 @@ document.addEventListener('click',e=>{
   }
 });
 document.addEventListener('change',e=>{
-  {const t=e.target;if(t.id==='anSel'){anSubj=t.value;render();return}if(t.id==='anHi'||t.id==='anLo'){const h=+$('#anHi').value,l=+$('#anLo').value;if(h>l&&l>=0&&h<=100){S.info.cat=[h,l];saveInfo();render()}else toast('حد المتفوق يجب أن يكون أكبر من حد المتوسط');return}if(t.id==='anMax'){const n=+normDigits(t.value);if(n>0){S.diag=S.diag||{};const d=S.diag[anSubj]=S.diag[anSubj]||{v:{}};d.max=n;saveDiag();render()}return}if(t.dataset&&t.dataset.dg){if(anSetDiag(t.dataset.dg,t.value)!==false)anRerender();return}if(t.id==='meSel'){meT=t.value;try{localStorage.setItem('grades-ar-me',meT)}catch(x){}const tt=curTeacher();if(tt&&(tt.cls||[]).length&&!(tt.cls||[]).includes(curCls))openClass(tt.cls[0]);else render();return}if(t.id==='stSel'){stSel=t.value;render();return}if(t.id==='stCls'){stCls=t.value;render();return}}
+  {const t=e.target;if(t.id==='anSel'){anSubj=t.value;render();return}if(t.id==='anB'){S.info.anb=t.value;saveInfo();render();return}if(t.id==='anHi'||t.id==='anLo'){const h=+$('#anHi').value,l=+$('#anLo').value;if(h>l&&l>=0&&h<=100){S.info.cat=[h,l];saveInfo();render()}else toast('حد المتفوق يجب أن يكون أكبر من حد المتوسط');return}if(t.id==='anMax'){const n=+normDigits(t.value);if(n>0){S.diag=S.diag||{};const d=S.diag[anSubj]=S.diag[anSubj]||{v:{}};d.max=n;saveDiag();render()}return}if(t.dataset&&t.dataset.dg){if(anSetDiag(t.dataset.dg,t.value)!==false)anRerender();return}if(t.id==='meSel'){meT=t.value;try{localStorage.setItem('grades-ar-me',meT)}catch(x){}const tt=curTeacher();if(tt&&(tt.cls||[]).length&&!(tt.cls||[]).includes(curCls))openClass(tt.cls[0]);else render();return}if(t.id==='stSel'){stSel=t.value;render();return}if(t.id==='stCls'){stCls=t.value;render();return}}
   const t=e.target;
   if(t.type==='checkbox'&&t.closest&&t.closest('.nsel')){noteMselChanged(t.closest('.nsel'));return}
   if(t.id==='clsSel'){openClass(t.value);return}
