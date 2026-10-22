@@ -376,6 +376,12 @@ body.gated{overflow:hidden}
 .cform label{display:grid;gap:4px;font-weight:700;color:var(--ink);font-size:13.5px}
 .cform select,.cform input[type=date],.cform textarea{border:1px solid var(--line2);border-radius:9px;padding:7px 9px;font:600 14px var(--f);background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
 .cform .cfull{margin-top:10px}.cform .cfull small{color:var(--muted);font-weight:600}
+.csug{margin-top:8px;border:1px dashed var(--line2);border-radius:12px;padding:10px 12px;background:var(--soft)}
+.csh{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.csh b{font-family:var(--fh)}
+.cgrp{margin-top:6px}.cgrp>summary{cursor:pointer;font-weight:800;font-size:13.5px;color:var(--teal-d);padding:4px 0}
+.cchips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+.cchip{border:1px solid var(--line2);background:#fff;border-radius:999px;padding:5px 12px;font:600 13px var(--f);color:var(--ink);cursor:pointer;text-align:start;line-height:1.5}
+.cchip:hover{border-color:var(--teal)}.cchip.on{background:var(--teal);border-color:var(--teal);color:#fff}
 /* written work */
 table.wkt{width:100%;border-collapse:collapse;min-width:560px}table.wkt th,table.wkt td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:center}
 table.wkt th{background:var(--soft);font-size:13px;color:var(--ink)}table.wkt th small{display:block;color:var(--muted);font-weight:600;font-size:11px}
@@ -1137,6 +1143,23 @@ const COM_LVL=['متفوق','جيد جدًا','جيد','مقبول','يحتاج 
 const COM_TSK=['ينجز مهامه بإتقان ويشارك في المبادرات','ينجز مهامه في الوقت المحدد','ينجز بعض مهامه ويحتاج إلى متابعة','لا ينجز مهامه ويحتاج إلى متابعة جادة'];
 const COM_W=['منتظم','ناقص','غير منتظم'];
 const COM_WL=['حل أسئلة الكراسة (المذكرة)','ملف الأنشطة','كتاب التدريبات'];
+const COM_SUG=[
+ ['👏 إشادة',['نشكر لكم متابعتكم المستمرة، وابنكم مثال للطالب المجتهد.','نفخر بمستوى ابنكم ونتمنى له دوام التفوق.','ابنكم متميز في المشاركة الصفية ونشجعه على الاستمرار.','لاحظنا تحسنًا واضحًا في مستوى ابنكم، فله منا كل الشكر والتشجيع.']],
+ ['📚 التحصيل الدراسي',['نوصي بمراجعة الدروس يوميًا ولو لوقت قصير.','نأمل التركيز على مهارات القراءة والفهم في المنزل.','يحتاج إلى مزيد من التدريب على الكتابة الصحيحة والإملاء.','نوصي بحل أسئلة الكراسة والاختبارات السابقة استعدادًا للاختبار القادم.','نأمل متابعة واجباته اليومية والتأكد من فهمه للدروس.','يحتاج إلى دعم في المهارات الأساسية، وقد بدأنا معه خطة علاجية في الصف.']],
+ ['🙂 السلوك',['ابنكم منضبط ومحترم، ويتعاون مع زملائه ومعلميه.','نأمل توجيه ابنكم إلى الالتزام بالهدوء والانتباه داخل الصف.','نرجو التأكيد على احترام الأنظمة المدرسية والالتزام بها.','نأمل الحرص على الحضور في الوقت المحدد وتجنب الغياب.']],
+ ['📒 الأعمال الكتابية',['نرجو متابعة حل أسئلة الكراسة (المذكرة) بانتظام.','نأمل الاهتمام باستكمال ملف الأنشطة وتنظيمه.','نرجو متابعة حل تمارين كتاب التدريبات أولًا بأول.','نشيد بانتظامه في حل الكراسة والأنشطة وكتاب التدريبات.']],
+ ['🤝 طلب تواصل',['نأمل زيارة المدرسة أو التواصل مع المعلم لمناقشة مستوى ابنكم.','نرجو الاطلاع على النموذج وإعادته موقّعًا مع ملاحظاتكم.','شاكرين تعاونكم، ونسعد بتواصلكم في أي وقت.']]];
+function comSuggest(r){
+  const out=[];
+  if(r.l!=null)out.push(r.l<=1?COM_SUG[0][1][1]:r.l===2?'مستوى ابنكم جيد، ونأمل مزيدًا من المراجعة ليرتقي إلى مستوى أعلى.':r.l===3?COM_SUG[1][1][4]:COM_SUG[1][1][5]);
+  if(r.b!=null&&r.b>=2)out.push(r.b===2?COM_SUG[2][1][1]:COM_SUG[2][1][2]);
+  if(r.t!=null&&r.t>=2)out.push('نأمل تشجيع ابنكم على إنجاز مهامه والمشاركة في المبادرات الصفية.');
+  const w=(r.w||[]).map((x,j)=>x!=null&&x>=1?j:null).filter(x=>x!=null);
+  if(w.length)out.push('نرجو متابعة '+w.map(j=>['حل أسئلة الكراسة (المذكرة)','ملف الأنشطة','كتاب التدريبات'][j]).join(' و')+' بانتظام.');
+  else if((r.w||[]).some(x=>x===0))out.push(COM_SUG[3][1][3]);
+  out.push(COM_SUG[4][1][2]);
+  return out.join(' ');
+}
 let comStud=null,comEdit=null,comDraft=null;
 const comSubj=()=>AR_ONLY?'ara':(scope!=='all'?scope:curSubj);
 const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
@@ -1164,7 +1187,10 @@ function vCom(v){
      <label>🎯 المهام والمبادرات${sel('comT',COM_TSK,rec.t)}</label>
      ${COM_WL.map((w,j)=>`<label>📒 ${w}${sel('comW'+j,COM_W,rec.w?rec.w[j]:null)}</label>`).join('')}
     </div>
-    <label class="cfull">📝 ملاحظات المعلم<textarea id="comN" rows="3" ${ro?'disabled':''} placeholder="ملاحظة مختصرة لولي الأمر">${esc(rec.n||'')}</textarea></label>
+    <label class="cfull">📝 ملاحظات المعلم<textarea id="comN" rows="3" ${ro?'disabled':''} placeholder="اكتب ملاحظتك، أو اختر من المقترحات أدناه">${esc(rec.n||'')}</textarea></label>
+    ${ro?'':`<div class="csug"><div class="csh"><b>💡 مقترحات لملاحظات المعلم</b><span class="sp"></span><button type="button" class="btn sm" id="comAuto">✨ اقتراح ملاحظة حسب اختياراتك</button><button type="button" class="btn w sm" id="comClr">مسح الملاحظة</button></div>
+     <p class="hint" style="margin:4px 0 6px">اضغط أي عبارة لإضافتها إلى الملاحظة، واضغطها مرة أخرى لحذفها.</p>
+     ${COM_SUG.map((g,gi)=>`<details class="cgrp" open><summary>${g[0]}</summary><div class="cchips">${g[1].map((t,ti)=>`<button type="button" class="cchip${(rec.n||'').includes(t)?' on':''}" data-csug="${gi}-${ti}">${esc(t)}</button>`).join('')}</div></details>`).join('')}</div>`}
     <label class="cfull">👪 ملاحظات ولي الأمر <small>(تُكتب عند عودة النموذج — وتبقى فارغة في النموذج المطبوع إن لم تُكتب)</small><textarea id="comP" rows="2" ${ro?'disabled':''}>${esc(rec.p||'')}</textarea></label>
     <div class="tools" style="margin-top:10px">${ro?'':`<button class="btn ok" id="comSave" type="button">💾 ${comEdit?'حفظ التعديل':'حفظ التواصل'}</button>${comEdit?'<button class="btn w" id="comNew" type="button">➕ تواصل جديد</button>':''}`}
      <span class="sp"></span><button class="btn w" id="comPdf" type="button">📄 النموذج PDF</button><button class="btn w" id="comAll" type="button">📄 نماذج جميع الطلاب</button></div>
@@ -2343,6 +2369,9 @@ document.addEventListener('click',e=>{
   if(t.dataset.word){const src=document.getElementById(t.dataset.word);if(src){wordNext=true;src.disabled=false;src.click();setTimeout(()=>{wordNext=false},0)}return}
   if(t.id==='comPrev'||t.id==='comNext'){const i=S.roster.findIndex(s=>s.id===comStud)+(t.id==='comNext'?1:-1);if(S.roster[i]){comStud=S.roster[i].id;comEdit=null;comDraft=null;render()}return}
   if(t.id==='comSave'){const r=comRead();S.com=S.com||{};const L=S.com[comStud]=(S.com[comStud]||[]).slice();const rec={id:r.id||('c'+Date.now().toString(36)),d:r.d,k:r.k,b:r.b,l:r.l,t:r.t,w:r.w,n:r.n,p:r.p};const i=L.findIndex(x=>x.id===rec.id);if(i>=0)L[i]=rec;else L.push(rec);S.com[comStud]=L;saveCom();if(mode==='local'&&ghReady()){clearTimeout(ghTimer);ghPush()}comEdit=rec.id;comDraft=null;render();toast('💾 حُفظ التواصل مع ولي الأمر');return}
+  if(t.dataset.csug){const [g,i]=t.dataset.csug.split('-').map(Number),txt=COM_SUG[g][1][i],ta=$('#comN');let v=ta.value.trim();if(v.includes(txt)){v=v.replace(txt,'').replace(/\s{2,}/g,' ').trim();t.classList.remove('on')}else{v=(v?v+' ':'')+txt;t.classList.add('on')}ta.value=v;comRead();return}
+  if(t.id==='comAuto'){const r=comRead(),ta=$('#comN');ta.value=comSuggest(r);comRead();document.querySelectorAll('.cchip').forEach(b=>{const [g,i]=b.dataset.csug.split('-').map(Number);b.classList.toggle('on',ta.value.includes(COM_SUG[g][1][i]))});toast('✨ اقتُرحت ملاحظة حسب السلوك والمستوى والمهام والأعمال الكتابية — عدّلها كما تريد');return}
+  if(t.id==='comClr'){$('#comN').value='';comRead();document.querySelectorAll('.cchip.on').forEach(b=>b.classList.remove('on'));return}
   if(t.id==='comNew'){comEdit=null;comDraft=null;render();return}
   if(t.dataset.come){comEdit=t.dataset.come;comDraft=null;render();window.scrollTo({top:0,behavior:'smooth'});return}
   if(t.dataset.comdel){if(t.dataset.arm!=='1'){t.dataset.arm='1';t.textContent='تأكيد الحذف';return}S.com[comStud]=(S.com[comStud]||[]).filter(x=>x.id!==t.dataset.comdel);saveCom();if(comEdit===t.dataset.comdel){comEdit=null;comDraft=null}render();toast('حُذف التواصل');return}
