@@ -1181,7 +1181,7 @@ function comForm(st,rec){
   const I=S.info,k=rec.k||comSubj(),dt=rec.d?wkDateTxt(rec.d)+' <span dir="ltr">'+esc(rec.d)+'</span>':'';
   const row=(a,b)=>`<tr><td class="rp-n" style="width:34%">${a}</td><td style="text-align:right;font-weight:700">${b==null||b===''?'<span style="color:#9aa5b1">..........................................</span>':esc(b)}</td></tr>`;
   return `<div class="rp-hd"><img src="${LETTERHEAD}" alt=""></div><div class="rp-tb"><h1>نموذج التواصل مع ولي الأمر</h1><small>${esc(I.term||'')} <span dir="ltr">${esc(I.year||'')}</span></small></div>
-  <div class="rp-info"><span>اسم الطالب: <b>${esc(st.name)}</b></span><span>الصف: <b>${esc(clsName())}</b></span><span>المادة: <b>${esc(BY[k].n)}</b></span><span>المعلم: <b>${esc(subjTeacherName(k)||S.ct||I.teacher||'')}</b></span><span>التاريخ: <b>${dt}</b></span><span>الرقم الشخصي: <b>${esc(st.pid||'—')}</b></span></div>
+  <div class="rp-info"><span>اسم الطالب: <b>${esc(st.name)}</b></span><span>الصف: <b>${esc(clsName())}</b></span><span>المادة: <b>${esc(BY[k].n)}</b></span><span>المعلم: <b>${esc(subjTeacherName(k)||ctName())}</b></span><span>التاريخ: <b>${dt}</b></span><span>الرقم الشخصي: <b>${esc(st.pid||'—')}</b></span></div>
   <p style="margin:10px 0 4px;font-weight:700">ولي أمر الطالب المحترم، تحية طيبة وبعد: نضع بين أيديكم ملاحظاتنا عن ابنكم، آملين تعاونكم ومتابعتكم.</p>
   <table style="margin-top:6px"><tbody>
    ${row('🙂 السلوك',rec.b!=null?COM_BEH[rec.b]:null)}${row('📊 المستوى الدراسي',rec.l!=null?COM_LVL[rec.l]:null)}${row('🎯 المهام والمبادرات',rec.t!=null?COM_TSK[rec.t]:null)}
@@ -1715,7 +1715,12 @@ let staffImp=null,staffDelArm=null;
 const saveStaff=()=>{if(canWrite)queueWrite('meta/staff',()=>({list:S.staff}))};
 const staffOf=k=>(S.staff||[]).filter(t=>t.subj.includes(k));
 const staffByUid=uid=>(S.staff||[]).find(t=>t.uid&&t.uid===uid);
-function subjTeacherName(k){const t=A()[k]&&staffByUid(A()[k]);if(t)return t.name;const s=staffOf(k)[0];return s?s.name:''}
+function subjTeacherName(k,c){c=c||curCls;const t=A()[k]&&staffByUid(A()[k]);if(t)return t.name;
+  const L=S.staff||[],teaches=x=>(x.tt||[]).some(y=>y[3]===c&&y[4]===k)||((x.subj||[]).includes(k)&&(x.cls||[]).includes(c));
+  const me_=curTeacher();if(me_&&teaches(me_))return me_.name;
+  const byTT=L.map(x=>({x,n:(x.tt||[]).filter(y=>y[3]===c&&y[4]===k).length})).filter(o=>o.n).sort((a,b)=>b.n-a.n);if(byTT.length)return byTT[0].x.name;
+  const s=L.find(x=>(x.subj||[]).includes(k)&&(x.cls||[]).includes(c));return s?s.name:''}
+const ctName=()=>S.ct||((curTeacher()||{}).name)||'';
 function suggestUid(t){if(t.uid)return t.uid;const n=arNorm(t.name).split(' ').filter(w=>w.length>2);
   return teachers.find(id=>{const pn=arNorm(tnames[id]||'');return pn&&n.length&&n.filter(w=>pn.includes(w)).length>=Math.min(2,n.length)})||''}
 function applyStaffImport(replace){
@@ -2025,7 +2030,7 @@ function rpBars(list,R,W,la){
 }
 function rpFoot(I,R,note,tn){
   return `${R.note?`<h2>ملاحظة المعلم</h2><div class="rp-note">${note?esc(note):'—'}</div>`:''}
-<div class="rp-sig"><span>المعلم: ${esc(tn||S.ct||I.teacher)}</span><span>توقيع ولي الأمر: <i></i></span><span>مدير المدرسة: ${esc(I.principal||'')}</span></div>`;
+<div class="rp-sig"><span>المعلم: ${esc(tn||ctName())}</span><span>توقيع ولي الأمر: <i></i></span><span>مدير المدرسة: ${esc(I.principal||'')}</span></div>`;
 }
 
 /* report charts (inline SVG so they print sharply in the PDF) */
@@ -2079,7 +2084,7 @@ function reportBody(st){
   const o=overall(st.id),c=classStats('all');
   const rank=c.rows.filter(r=>r.o.pct!=null).sort((a,b)=>b.o.pct-a.o.pct).findIndex(r=>r.st.id===st.id);
   const rows=ACT().map(s=>{const t=s.part?subjStats(s.k,st.id):o.per[s.k];return `<tr${s.part?' class="rp-part"':''}><td class="rp-n">${esc(s.n)}${s.part?'<small> (ضمن الإسلامية)</small>':''}</td><td style="white-space:nowrap"><b>${t.ent?fmt(t.earned):'—'}</b> <small>من ${s.max}</small></td><td>${pctS(t.pct)}</td><td>${lvHTML(t.pct)}</td>${R.items?`<td class="rp-g">${t.groups.map(g=>`${esc(g.n)}: <b>${g.ent?fmt(g.earned)+' من '+fmt(g.assessed):'—'}</b>`).join(' · ')}</td>`:''}</tr>`}).join('');
-  return rpTop(st,I,'تقرير متابعة أداء الطالب',`<span>معلم الصف: <b>${esc(S.ct||I.teacher)}</b></span><span>اكتمال الرصد: <b>${fmt(o.comp*100,0)}%</b></span>`)+
+  return rpTop(st,I,'تقرير متابعة أداء الطالب',`${ctName()?`<span>معلم الصف: <b>${esc(ctName())}</b></span>`:''}<span>اكتمال الرصد: <b>${fmt(o.comp*100,0)}%</b></span>`)+
   `<div class="rp-hero">${ringSVG(o.pct,104)}<div class="rp-t"><span class="rp-big">نسبة الإنجاز العامة: <b>${pctS(o.pct)}</b></span><span>المستوى: ${lvHTML(o.pct)}</span><span>${R.avg?`متوسط الصف: <b>${pctS(c.avg)}</b>`:''}${R.rank&&rank>=0?` · الترتيب: <b>${rank+1}</b> من ${c.assessedN}`:''}</span></div></div>
   ${R.att!==false?rpAtt(st,R):''}${R.wrk!==false?rpWrk(st,R,'all'):''}
   <h2>الإنجاز في المواد</h2>${rpBars(CNT().map(s=>({n:s.n,p:o.per[s.k].pct,a:c.subjAvg[s.k]})),R)}
@@ -2154,7 +2159,7 @@ function gradeSheet(k){
       return g.link?tot:g.items.map(it=>{const v=arr[it.i];return `<td${typeof v==='number'&&v>it.max?' class="ov"':''}>${typeof v==='number'?fmt(v):''}</td>`}).join('')+tot}).join('')}
       <td class="tot">${t.ent?fmt(t.earned):''}</td><td class="tot">${t.pct==null?'—':fmt(t.pct,0)+'%'}</td><td>${t.pct==null?'':level(t.pct).n}</td></tr>`}).join('');
   const c=classStats(k);
-  return shHead('كشف المتابعات والمهام — '+esc(s.n),`<span>المادة: <b>${esc(s.n)}</b> (من ${s.max})</span><span>متوسط الإنجاز: <b>${pctS(c.avg)}</b></span><span>اكتمال الرصد: <b>${pctS(c.comp*100)}</b></span>${A()[k]?`<span>معلم المادة: <b>${esc(tName(A()[k]))}</b></span>`:''}`)+
+  return shHead('كشف المتابعات والمهام — '+esc(s.n),`<span>المادة: <b>${esc(s.n)}</b> (من ${s.max})</span><span>متوسط الإنجاز: <b>${pctS(c.avg)}</b></span><span>اكتمال الرصد: <b>${pctS(c.comp*100)}</b></span>${subjTeacherName(k)?`<span>معلم المادة: <b>${esc(subjTeacherName(k))}</b></span>`:''}`)+
    `<table class="sh" style="margin-top:8px"><thead><tr><th rowspan="2">#</th><th rowspan="2" class="nm">اسم الطالب</th>${head1}<th rowspan="2">المجموع<small>من ${s.max}</small></th><th rowspan="2">الإنجاز</th><th rowspan="2">المستوى</th></tr><tr>${head2}</tr></thead><tbody>${rows}</tbody></table>
    <div class="sh-leg">الخانة الفارغة = لم يُرصد بعد · نسبة الإنجاز محسوبة مما رُصد حتى الآن</div>`+shSig();
 }
