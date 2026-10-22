@@ -371,6 +371,11 @@ body.gated{overflow:hidden}
 .attbar select{border:1px solid var(--line2);border-radius:9px;padding:5px 8px;font:700 13.5px var(--fh);background:#fff;color:var(--ink)}
 .attbar .sp{flex:1}.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
 @media (max-width:560px){.attbar .btn{flex:1 1 100%;justify-content:center}.attbar label{flex:1 1 100%}.attbar select{flex:1}}
+/* parent communication */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px 14px}
+.cform label{display:grid;gap:4px;font-weight:700;color:var(--ink);font-size:13.5px}
+.cform select,.cform input[type=date],.cform textarea{border:1px solid var(--line2);border-radius:9px;padding:7px 9px;font:600 14px var(--f);background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
+.cform .cfull{margin-top:10px}.cform .cfull small{color:var(--muted);font-weight:600}
 /* written work */
 table.wkt{width:100%;border-collapse:collapse;min-width:560px}table.wkt th,table.wkt td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:center}
 table.wkt th{background:var(--soft);font-size:13px;color:var(--ink)}table.wkt th small{display:block;color:var(--muted);font-weight:600;font-size:11px}
@@ -463,7 +468,7 @@ table.ttg td{background:var(--soft);border-radius:8px;height:62px;padding:3px;ve
 .tile .ts{grid-area:s;justify-self:start;font-weight:800;font-size:12px;color:var(--c);background:var(--cl);border-radius:999px;padding:2px 10px}
 .tile .tgo{grid-area:g;font-size:26px;color:var(--c);font-weight:700}
 .tile.t1{--c:var(--teal);--cl:var(--teal-l)}.tile.t2{--c:var(--ok);--cl:var(--ok-l)}.tile.t3{--c:var(--blue);--cl:var(--blue-l)}
-.tile.t4{--c:var(--orange);--cl:var(--orange-l)}.tile.t7{--c:#8a5cd6;--cl:#f3eefc}.tile.t9{--c:#c04d6e;--cl:#fbf0f3}.tile.t10{--c:#2a6f97;--cl:#eaf2f8}.tile.t8{--c:var(--teal-d);--cl:var(--teal-l)}.tile.t5{--c:var(--pink);--cl:var(--pink-l)}.tile.t6{--c:var(--navy);--cl:#eef1f5}
+.tile.t4{--c:var(--orange);--cl:var(--orange-l)}.tile.t7{--c:#8a5cd6;--cl:#f3eefc}.tile.t9{--c:#c04d6e;--cl:#fbf0f3}.tile.t10{--c:#2a6f97;--cl:#eaf2f8}.tile.t11{--c:#b5531a;--cl:#fbf4ec}.tile.t8{--c:var(--teal-d);--cl:var(--teal-l)}.tile.t5{--c:var(--pink);--cl:var(--pink-l)}.tile.t6{--c:var(--navy);--cl:#eef1f5}
 .qsubs{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 10px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:thin}
 .qhd{display:flex;align-items:center;justify-content:space-between;gap:8px}.qarr{display:inline-flex;gap:6px;margin-top:10px}
 .qarr button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);background:#fff;font-size:20px;line-height:1;color:var(--navy);cursor:pointer;box-shadow:var(--sh1)}.qarr button:hover{background:var(--teal-l)}
@@ -500,6 +505,7 @@ table.ttg td{background:var(--soft);border-radius:8px;height:62px;padding:3px;ve
     <button class="tab" role="tab" data-t="entry" aria-selected="false">✏️ رصد الدرجات</button>
     <button class="tab" role="tab" data-t="att" aria-selected="false">🗓️ الحضور والغياب</button>
     <button class="tab" role="tab" data-t="prof" aria-selected="false">🧑‍🎓 ملف الطالب</button>
+    <button class="tab" role="tab" data-t="com" aria-selected="false">📨 التواصل مع ولي الأمر</button>
     <button class="tab" role="tab" data-t="studs" aria-selected="false">👥 الطلاب</button>
     <button class="tab" role="tab" data-t="wrk" aria-selected="false">📒 متابعة الأعمال الكتابية</button>
     <button class="tab" role="tab" data-t="anal" aria-selected="false">📈 تحليل الدرجات والتصنيف</button>
@@ -669,9 +675,9 @@ async function flushWrites(){
   await Promise.all(jobs);return Object.values(pend).every(p=>p.ok!==false);
 }
 const LKEY='grades-local-v2';
-function saveLocal(){ghMark&&ghMark(curCls);try{localStorage.setItem(LKEY+'-g',JSON.stringify({info:S.info,staff:S.staff}));localStorage.setItem(LKEY+'-'+curCls,JSON.stringify({roster:S.roster,marks:S.marks,notes:S.notes,assign:S.assign,ct:S.ct,ctId:S.ctId,att:S.att,diag:S.diag,wrk:S.wrk}));setSave('محفوظ على هذا الجهاز')}catch(e){setSave('تعذّر الحفظ المحلي')}}
+function saveLocal(){ghMark&&ghMark(curCls);try{localStorage.setItem(LKEY+'-g',JSON.stringify({info:S.info,staff:S.staff}));localStorage.setItem(LKEY+'-'+curCls,JSON.stringify({roster:S.roster,marks:S.marks,notes:S.notes,assign:S.assign,ct:S.ct,ctId:S.ctId,att:S.att,diag:S.diag,wrk:S.wrk,com:S.com}));setSave('محفوظ على هذا الجهاز')}catch(e){setSave('تعذّر الحفظ المحلي')}}
 function loadLocal(){try{const g=JSON.parse(localStorage.getItem(LKEY+'-g')||'null');if(g){Object.assign(S.info,g.info||{});S.staff=g.staff||[]}
-  const d=JSON.parse(localStorage.getItem(LKEY+'-'+curCls)||'null')||{};S.roster=d.roster||[];S.notes=d.notes||{};S.assign=d.assign||{};S.ct=d.ct||'';S.ctId=d.ctId||'';S.att=d.att||{};S.diag=d.diag||{};S.wrk=d.wrk||{};SUBJ.forEach(s=>S.marks[s.k]=(d.marks&&d.marks[s.k])||{})}catch(e){}}
+  const d=JSON.parse(localStorage.getItem(LKEY+'-'+curCls)||'null')||{};S.roster=d.roster||[];S.notes=d.notes||{};S.assign=d.assign||{};S.ct=d.ct||'';S.ctId=d.ctId||'';S.att=d.att||{};S.diag=d.diag||{};S.wrk=d.wrk||{};S.com=d.com||{};SUBJ.forEach(s=>S.marks[s.k]=(d.marks&&d.marks[s.k])||{})}catch(e){}}
 const A=()=>S.assign||{};
 const cPath=(c)=>'cls/'+(c||curCls);
 const markPathIn=(c,k,uid)=>uid?'tm/'+uid+'/c/'+c+'/m/'+k:'cls/'+c+'/m/'+k;
@@ -683,6 +689,7 @@ const saveMarks=k=>{if(canSubj(k))queueWrite(markPath(k),()=>({v:S.marks[k]}))};
 const saveTNotes=k=>{if(A()[k]&&canSubj(k))queueWrite('tm/'+A()[k]+'/c/'+curCls+'/n/'+k,()=>({map:S.tnotes[k]||{}}))};
 const saveRoster=()=>canWrite&&queueWrite(cPath()+'/meta/roster',()=>({list:S.roster}));
 const saveInfo=()=>canWrite&&queueWrite('meta/info',()=>Object.assign({},S.info));
+const saveCom=()=>canWrite&&queueWrite(cPath()+'/meta/com',()=>({v:S.com}));
 const saveWrk=()=>canWrite&&queueWrite(cPath()+'/meta/wrk',()=>({v:S.wrk}));
 const saveDiag=()=>canWrite&&queueWrite(cPath()+'/meta/diag',()=>({v:S.diag}));
 const saveNotes=()=>canWrite&&queueWrite(cPath()+'/meta/notes',()=>({map:S.notes}));
@@ -725,7 +732,7 @@ function openClass(c,first){
   Object.keys(subs).forEach(k=>{try{subs[k].un()}catch(e){}delete subs[k]});
   Object.keys(tsubs).forEach(k=>{try{tsubs[k].un()}catch(e){}delete tsubs[k]});
   curCls=c;try{localStorage.setItem('grades-cls',c)}catch(e){}
-  S.roster=[];S.notes={};S.assign={};S.ct='';S.ctId='';S.tnotes={};S.att={};S.diag={};S.wrk={};SUBJ.forEach(s=>S.marks[s.k]={});
+  S.roster=[];S.notes={};S.assign={};S.ct='';S.ctId='';S.tnotes={};S.att={};S.diag={};S.wrk={};S.com={};SUBJ.forEach(s=>S.marks[s.k]={});
   curStud=null;rosterLoaded=false;roleSet=false;unlocked=false;delArm=null;impRows=null;
   if(mode==='local'){loadLocal();rosterLoaded=true;if(S.roster[0])curStud=S.roster[0].id;render();return}
   if(mode!=='db'){render();return}
@@ -737,6 +744,7 @@ function openClass(c,first){
     const firstLoad=!rosterLoaded;rosterLoaded=true;
     if(!firstLoad&&_same(list,S.roster))return;
     S.roster=list;if((!curStud||!S.roster.find(x=>x.id===curStud))&&S.roster[0])curStud=S.roster[0].id;softRender()},onErr));
+  csubs.push(db.doc(base+'/meta/com').onSnapshot(s=>{if(c!==curCls)return;const p=pend[base+'/meta/com'];if(s.metadata.hasPendingWrites||(p&&(p.busy||p.queued))||(!s.exists&&s.metadata.fromCache))return;const n=s.exists?_clone(s.data().v||{}):{};if(_same(n,S.com))return;S.com=n;if(tab!=='com')softRender()},onErr));
   csubs.push(db.doc(base+'/meta/wrk').onSnapshot(s=>{if(c!==curCls)return;const p=pend[base+'/meta/wrk'];if(s.metadata.hasPendingWrites||(p&&(p.busy||p.queued))||(!s.exists&&s.metadata.fromCache))return;const n=s.exists?_clone(s.data().v||{}):{};if(_same(n,S.wrk))return;S.wrk=n;softRender()},onErr));
   csubs.push(db.doc(base+'/meta/diag').onSnapshot(s=>{if(c!==curCls)return;const p=pend[base+'/meta/diag'];if(s.metadata.hasPendingWrites||(p&&(p.busy||p.queued))||(!s.exists&&s.metadata.fromCache))return;const n=s.exists?_clone(s.data().v||{}):{};if(_same(n,S.diag))return;S.diag=n;softRender()},onErr));
   csubs.push(db.doc(base+'/meta/notes').onSnapshot(s=>{if(c!==curCls)return;if(s.metadata.hasPendingWrites||(!s.exists&&s.metadata.fromCache))return;const n=s.exists?_clone(s.data().map||{}):{};if(_same(n,S.notes))return;S.notes=n;softRender()},onErr));
@@ -988,7 +996,7 @@ function render(){
   if(mode==='loading'||(mode==='db'&&!rosterLoaded)){v.innerHTML='<div class="empty">جارٍ تحميل السجل…</div>';return}
   if(!S.roster.length&&tab!=='studs'&&tab!=='set'&&tab!=='help'&&tab!=='staff'){v.innerHTML=`<div class="note warn" style="margin-top:14px">لا توجد أسماء طلاب في ${esc(clsName())} بعد. افتح تبويب <b>الطلاب</b> لإضافة الأسماء أو استيرادها من ملف Excel.</div>`;return}
   setTimeout(()=>{freezeNames();addWordButtons()},0);
-  ({home:vHome,help:vHelp,staff:vStaff,anal:vAnal,wrk:vWrk,dash:vDash,entry:vEntry,att:vAtt,prof:vProf,studs:vStuds,set:vSet})[tab](v);
+  ({home:vHome,help:vHelp,staff:vStaff,anal:vAnal,wrk:vWrk,com:vCom,dash:vDash,entry:vEntry,att:vAtt,prof:vProf,studs:vStuds,set:vSet})[tab](v);
 }
 
 Chart.defaults.font.family="'Cairo','Segoe UI',Tahoma,sans-serif";Chart.defaults.color='#5d6b78';Chart.defaults.font.size=12;
@@ -1012,6 +1020,7 @@ function vHome(v){
     ${tile('dash','📊','لوحة المتابعة','نسب الإنجاز والرسوم البيانية وترتيب الطلاب',pctS(c.avg)+' متوسط','t3')}
     ${tile('prof','🧑‍🎓','ملف الطالب وتقرير ولي الأمر','درجات كل طالب وملاحظاتك وتقرير PDF',n+' طالبًا','t4')}
     ${canSet?tile('studs','👥','الطلاب','إضافة أو حذف أو استيراد الأسماء',n+' طالبًا','t5'):''}
+    ${tile('com','📨','التواصل مع ولي الأمر','نموذج لكل طالب: السلوك والمستوى والمهام والأعمال الكتابية',null,'t11')}
     ${tile('wrk','📒','متابعة الأعمال الكتابية','المذكرة والأنشطة وكتاب التدريبات — متابعة شهرية',null,'t10')}
     ${tile('anal','📈','تحليل الدرجات والتصنيف','التشخيصي والاختبارات وتصنيف الطلاب: متفوقون، متوسطون، منخفضو التحصيل',null,'t9')}
     ${tile('staff','🗓️','جدول المعلمين','حصص كل معلم وجدول كل صف أسبوعيًا',(S.staff||[]).length+' معلمًا','t7')}
@@ -1027,6 +1036,7 @@ const HELP=[
  ['☰','التنقل واختيار الصف والمادة',['زر الخطوط الثلاثة أعلى اليمين يفتح قائمة كل الصفحات.','اختر اسمك من قائمة «👨‍🏫 المعلم» فتظهر مستطيلات صفوفك، واضغط المستطيل للدخول إلى الصف ومادتك (أو اختر «المعلمين» لعرض كل الصفوف).','«📚 المادة»: «كل المواد» للإنجاز الكلي أو مادة واحدة لعرض لوحتها وتقاريرها.']],
  ['✏️','رصد الدرجات',['اختر المادة، ثم استخدم + لرفع الدرجة و− لخفضها، أو اكتبها مباشرة.','اضغط Enter للانتقال إلى الطالب التالي، أو الأسهم ↑ ↓.','الخانة الحمراء = درجة أكبر من الحد الأعلى ولن تُحفظ. اترك الخانة فارغة إن لم يُقيَّم الطالب.','الحفظ تلقائي مع كل تعديل.','زر «📄 تنزيل المتابعات والمهام PDF» يُخرج كشف المادة كاملًا بعناصرها ومجاميعها.']],
  ['🗓️','الحضور والغياب',['اختر الشهر من التبويبات (سبتمبر – يناير).','اختر اليوم ثم اضغط «✓ تسجيل جميع الطلاب حضورًا»، ثم عدّل الغائبين فقط.','زر «💾 حفظ الغياب» يحفظ ويرفع الغياب فورًا، و«📄 كشف الشهر PDF» و«📄 ملخص الفصل PDF» لتنزيل كشوف الغياب.','كل ضغطة على الخانة: حاضر ← غائب ← متأخر ← بعذر ← فارغ. وزر ⊘ تحت اليوم يجعله عطلة.']],
+ ['📨','التواصل مع ولي الأمر',['اختر الطالب، والنموذج يقترح المستوى الدراسي والأعمال الكتابية تلقائيًا من درجاته ومتابعته.','اختر من القوائم: السلوك، المستوى الدراسي، المهام والمبادرات، حل أسئلة الكراسة، ملف الأنشطة، كتاب التدريبات، واكتب ملاحظاتك.','«💾 حفظ التواصل» يحفظه في سجل الطالب، و«📄 النموذج PDF / Word» للطباعة مع مكان ملاحظات ولي الأمر وتوقيعه.','«نماذج جميع الطلاب» يُخرج نموذجًا لكل طالب (آخر تواصل محفوظ أو مقترح تلقائي).']],
  ['📒','متابعة الأعمال الكتابية',['متابعة واحدة في نهاية كل شهر لانتظام حل: المذكرة، الأنشطة، كتاب التدريبات.','اختر الشهر، وتاريخ المتابعة يُضبط تلقائيًا على آخر يوم دراسي ويمكن تغييره.','اضغط الخانة: ✓ منتظم ← ناقص ← ✗ غير منتظم ← فارغ، أو «✓ الكل» لعمود كامل، أو «✓ الجميع منتظم» ثم عدّل غير المنتظمين.','«💾 حفظ المتابعة» يحفظ ويرفع فورًا، وزرّا PDF لكشف الشهر وملخص الفصل.']],
  ['📈','تحليل الدرجات والتصنيف',['«أساس التصنيف»: متوسط الاختبارات، أو الدرجة الكلية للمادة بكل عناصر تقييمها.','اختر المادة، واكتب درجة الاختبار التشخيصي لكل طالب (Enter للطالب التالي)، ويمكن تعديل الدرجة العظمى للتشخيصي.','درجات الاختبار الأول والثاني والثالث تُقرأ تلقائيًا من رصد الدرجات، ويظهر تقدّم كل طالب عن التشخيصي.','يُصنَّف الطلاب إلى: متفوقين، متوسطين، منخفضي التحصيل — وتُعدَّل الحدود من أعلى الصفحة (افتراضيًا 85% و 65%).','«📊 جميع المواد (تجميعي)» يعرض تحليل الصف في كل المواد معًا، وزر PDF لكل تحليل.']],
  ['📊','لوحة المتابعة',['مؤشرات: متوسط الإنجاز، اكتمال الرصد، الممتازون، ومن يحتاجون دعمًا.','رسوم: توزيع المستويات، الإنجاز في كل مادة، وترتيب الطلاب (اضغط الاسم لفتح ملفه).','خريطة الإنجاز تكشف نقاط القوة والضعف لكل طالب في كل مادة.']],
@@ -1120,6 +1130,67 @@ function freezeNames(){
       if(window.ResizeObserver){const ro=new ResizeObserver(()=>{build();sync()});ro.observe(tb)}}
     tw._fzb=build;
   });
+}
+/* ---------- parent communication form ---------- */
+const COM_BEH=['ممتاز ومثالي في سلوكه','منضبط ومحترم مع زملائه ومعلميه','جيد ويحتاج إلى بعض التوجيه','يحتاج إلى متابعة في الانضباط داخل الصف','يحتاج إلى تحسين سلوكه بشكل عاجل'];
+const COM_LVL=['متفوق','جيد جدًا','جيد','مقبول','يحتاج إلى دعم'];
+const COM_TSK=['ينجز مهامه بإتقان ويشارك في المبادرات','ينجز مهامه في الوقت المحدد','ينجز بعض مهامه ويحتاج إلى متابعة','لا ينجز مهامه ويحتاج إلى متابعة جادة'];
+const COM_W=['منتظم','ناقص','غير منتظم'];
+const COM_WL=['حل أسئلة الكراسة (المذكرة)','ملف الأنشطة','كتاب التدريبات'];
+let comStud=null,comEdit=null,comDraft=null;
+const comSubj=()=>AR_ONLY?'ara':(scope!=='all'?scope:curSubj);
+const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function comAuto(sid){
+  const k=comSubj(),t=subjStats(k,sid),L=level(t.pct),ms=attMonths().slice().reverse();
+  let w=[null,null,null];for(const m of ms){const r=((((S.wrk||{})[k]||{})[m.key]||{}).v||{})[sid];if(r){w=r.map(x=>x===1?0:x===2?1:x===0?2:null);break}}
+  return{d:todayISO(),k,b:null,l:L.i?L.i-1:null,t:null,w,n:'',p:''};
+}
+const comList=sid=>((S.com||{})[sid]||[]).slice().sort((a,b)=>(b.d||'').localeCompare(a.d||''));
+function vCom(v){
+  if(!S.roster.find(s=>s.id===comStud))comStud=(S.roster.find(s=>s.id===curStud)||S.roster[0]).id;
+  const st=S.roster.find(s=>s.id===comStud),L=comList(st.id),ro=!canWrite&&!(mode==='db'&&canSubj(comSubj()));
+  const rec=comDraft&&comDraft.sid===st.id?comDraft:Object.assign({sid:st.id},comEdit?(L.find(x=>x.id===comEdit)||comAuto(st.id)):comAuto(st.id));comDraft=rec;
+  const sel=(id,opts,val,ph)=>`<select id="${id}" ${ro?'disabled':''}><option value="">${ph||'— اختر —'}</option>${opts.map((o,i)=>`<option value="${i}"${val===i?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
+  const i=S.roster.findIndex(s=>s.id===st.id);
+  v.innerHTML=`<section class="home">
+   <div class="hwel"><div><small>نموذج التواصل مع ولي الأمر</small><h2>${esc(st.name)}</h2><p>${esc(clsName())} · ${esc(BY[comSubj()].n)}${L.length?' · '+L.length+' تواصل محفوظ':''}</p></div>
+    <div class="anbar"><label>🧑‍🎓 الطالب: <select id="comSt">${S.roster.map(s=>`<option value="${s.id}"${s.id===st.id?' selected':''}>${esc(s.name)}</option>`).join('')}</select></label>
+     <button class="btn w sm" id="comPrev" type="button" ${i>0?'':'disabled'}>→ السابق</button><button class="btn w sm" id="comNext" type="button" ${i<S.roster.length-1?'':'disabled'}>التالي ←</button></div></div>
+   <div class="card cform" style="margin-top:12px"><div class="ch"><h3>${comEdit?'✏️ تعديل التواصل':'➕ تواصل جديد'}</h3><small>القيم الافتراضية مقترحة من درجات الطالب ومتابعة الأعمال الكتابية — عدّلها كما تريد</small></div><div class="cb">
+    <div class="cgrid">
+     <label>📅 التاريخ<input type="date" id="comD" value="${esc(rec.d||todayISO())}" ${ro?'disabled':''}></label>
+     <label>🙂 السلوك${sel('comB',COM_BEH,rec.b)}</label>
+     <label>📊 المستوى الدراسي${sel('comL',COM_LVL,rec.l)}</label>
+     <label>🎯 المهام والمبادرات${sel('comT',COM_TSK,rec.t)}</label>
+     ${COM_WL.map((w,j)=>`<label>📒 ${w}${sel('comW'+j,COM_W,rec.w?rec.w[j]:null)}</label>`).join('')}
+    </div>
+    <label class="cfull">📝 ملاحظات المعلم<textarea id="comN" rows="3" ${ro?'disabled':''} placeholder="ملاحظة مختصرة لولي الأمر">${esc(rec.n||'')}</textarea></label>
+    <label class="cfull">👪 ملاحظات ولي الأمر <small>(تُكتب عند عودة النموذج — وتبقى فارغة في النموذج المطبوع إن لم تُكتب)</small><textarea id="comP" rows="2" ${ro?'disabled':''}>${esc(rec.p||'')}</textarea></label>
+    <div class="tools" style="margin-top:10px">${ro?'':`<button class="btn ok" id="comSave" type="button">💾 ${comEdit?'حفظ التعديل':'حفظ التواصل'}</button>${comEdit?'<button class="btn w" id="comNew" type="button">➕ تواصل جديد</button>':''}`}
+     <span class="sp"></span><button class="btn w" id="comPdf" type="button">📄 النموذج PDF</button><button class="btn w" id="comAll" type="button">📄 نماذج جميع الطلاب</button></div>
+   </div></div>
+   <h3 class="hsec">سجل التواصل مع ولي أمر ${esc(st.name)}</h3>
+   ${L.length?`<div class="tw card"><table class="an"><thead><tr><th>التاريخ</th><th>السلوك</th><th>المستوى</th><th>المهام</th><th class="nm">ملاحظات المعلم</th><th>ولي الأمر</th><th></th></tr></thead><tbody>
+    ${L.map(x=>`<tr><td><b dir="ltr">${esc(x.d||'')}</b></td><td>${x.b!=null?esc(COM_BEH[x.b]):'—'}</td><td>${x.l!=null?esc(COM_LVL[x.l]):'—'}</td><td>${x.t!=null?esc(COM_TSK[x.t]):'—'}</td><td class="nm" style="white-space:normal;font-weight:500">${esc(x.n||'—')}</td><td>${x.p?'✓ ردّ':'—'}</td>
+     <td style="white-space:nowrap"><button class="btn w sm" type="button" data-come="${x.id}">✏️ فتح</button>${ro?'':` <button class="btn r sm" type="button" data-comdel="${x.id}">حذف</button>`}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">لا يوجد تواصل محفوظ لهذا الطالب بعد.</p>'}
+  </section>`;
+}
+function comRead(){const g=id=>{const e=$('#'+id);return e?e.value:''},n=x=>x===''?null:+x;
+  return Object.assign(comDraft||{},{d:g('comD')||todayISO(),b:n(g('comB')),l:n(g('comL')),t:n(g('comT')),w:[0,1,2].map(j=>n(g('comW'+j))),n:g('comN').trim(),p:g('comP').trim(),k:comSubj()})}
+function comForm(st,rec){
+  const I=S.info,k=rec.k||comSubj(),dt=rec.d?wkDateTxt(rec.d)+' <span dir="ltr">'+esc(rec.d)+'</span>':'';
+  const row=(a,b)=>`<tr><td class="rp-n" style="width:34%">${a}</td><td style="text-align:right;font-weight:700">${b==null||b===''?'<span style="color:#9aa5b1">..........................................</span>':esc(b)}</td></tr>`;
+  return `<div class="rp-hd"><img src="${LETTERHEAD}" alt=""></div><div class="rp-tb"><h1>نموذج التواصل مع ولي الأمر</h1><small>${esc(I.term||'')} <span dir="ltr">${esc(I.year||'')}</span></small></div>
+  <div class="rp-info"><span>اسم الطالب: <b>${esc(st.name)}</b></span><span>الصف: <b>${esc(clsName())}</b></span><span>المادة: <b>${esc(BY[k].n)}</b></span><span>المعلم: <b>${esc(subjTeacherName(k)||S.ct||I.teacher||'')}</b></span><span>التاريخ: <b>${dt}</b></span><span>الرقم الشخصي: <b>${esc(st.pid||'—')}</b></span></div>
+  <p style="margin:10px 0 4px;font-weight:700">ولي أمر الطالب المحترم، تحية طيبة وبعد: نضع بين أيديكم ملاحظاتنا عن ابنكم، آملين تعاونكم ومتابعتكم.</p>
+  <table style="margin-top:6px"><tbody>
+   ${row('🙂 السلوك',rec.b!=null?COM_BEH[rec.b]:null)}${row('📊 المستوى الدراسي',rec.l!=null?COM_LVL[rec.l]:null)}${row('🎯 المهام والمبادرات',rec.t!=null?COM_TSK[rec.t]:null)}
+   ${COM_WL.map((w,j)=>row('📒 '+w,rec.w&&rec.w[j]!=null?COM_W[rec.w[j]]:null)).join('')}
+  </tbody></table>
+  <h2>ملاحظات المعلم</h2><div class="rp-note">${esc(rec.n||'')}</div>
+  <h2>ملاحظات ولي الأمر</h2><div class="rp-note" style="border-color:#0f9d9a;background:#fff;min-height:${rec.p?50:110}px">${rec.p?esc(rec.p):'<div style="border-bottom:1px dotted #9aa5b1;height:28px"></div><div style="border-bottom:1px dotted #9aa5b1;height:28px"></div><div style="border-bottom:1px dotted #9aa5b1;height:28px"></div>'}</div>
+  <div class="rp-sig" style="margin-top:22px"><span>اسم ولي الأمر: <i></i></span><span>توقيع ولي الأمر: <i></i></span><span>التاريخ: <i></i></span></div>
+  <div class="rp-sig" style="margin-top:14px"><span>توقيع المعلم: <i></i></span><span>يعتمد مدير المدرسة: ${esc(I.principal||'')}</span></div>`;
 }
 /* ---------- written work follow-up: notebook, activities, workbook — once a month ---------- */
 const WK=['المذكرة','الأنشطة','كتاب التدريبات'];
@@ -2139,9 +2210,16 @@ async function sheetDOC(btn,name,bodies,land){
   catch(e){console.error(e);toast(e&&e.message==='docx'?'تعذّر تحميل أداة Word — تحقق من الاتصال':'تعذّر إنشاء ملف Word')}
   finally{if(btn){btn.disabled=false;btn.textContent=old}}
 }
-const WORD_IDS=['attPdfM','attPdfT','entPdf','stPdf','anPdf','wkPdfM','wkPdfT','pExp','pAllOne','bAll'];
+const WORD_IDS=['comPdf','comAll','attPdfM','attPdfT','entPdf','stPdf','anPdf','wkPdfM','wkPdfT','pExp','pAllOne','bAll'];
 function addWordButtons(){WORD_IDS.forEach(id=>{const b=document.getElementById(id);if(!b||b.nextElementSibling&&b.nextElementSibling.dataset&&b.nextElementSibling.dataset.word)return;
-  const w=document.createElement('button');w.type='button';w.className='btn w wordb';w.dataset.word=id;w.textContent=id==='bAll'||id==='pAllOne'?'📝 Word لكل الطلاب':'📝 Word';w.title='تنزيل نفس التقرير بصيغة Word';if(b.disabled)w.disabled=true;b.insertAdjacentElement('afterend',w)})}
+  const w=document.createElement('button');w.type='button';w.className='btn w wordb';w.dataset.word=id;w.textContent=id==='bAll'||id==='pAllOne'||id==='comAll'?'📝 Word لكل الطلاب':'📝 Word';w.title='تنزيل نفس التقرير بصيغة Word';if(b.disabled)w.disabled=true;b.insertAdjacentElement('afterend',w)})}
+async function sheetPDFMulti(btn,name,bodies){
+  if(!canDL()){toast('التنزيل غير متاح في هذا العرض');return}
+  const old=btn&&btn.textContent;if(btn){btn.disabled=true}
+  try{const pdf=await PDFLib.PDFDocument.create();pdf.setTitle(name);for(let i=0;i<bodies.length;i++){if(btn)btn.textContent='⏳ '+(i+1)+' / '+bodies.length;await addHtmlPages(pdf,bodies[i],false)}
+    const ok=await saveFile(safeName(name)+'.pdf',new Blob([await pdf.save()],{type:'application/pdf'}));if(ok)toast('📄 تم تنزيل «'+name+'»')}
+  catch(e){console.error(e);toast('تعذّر إنشاء ملف PDF')}finally{if(btn){btn.disabled=false;btn.textContent=old}}
+}
 async function sheetPDF(btn,name,body,land){
   if(wordNext){wordNext=false;return sheetDOC(btn,name,[body],land)}
   if(!S.roster.length){toast('لا يوجد طلاب في هذا الصف');return}
@@ -2258,6 +2336,13 @@ document.addEventListener('click',e=>{
   if(t.dataset.stc){stCls=t.dataset.stc;stView='c';tab='staff';render();window.scrollTo({top:0});return}
   if(t.id==='stPdf'){const nm=stView==='c'?'جدول حصص '+clsShort(stCls):'جدول حصص '+(((S.staff||[]).find(x=>x.id===stSel)||{}).name||'');sheetPDF(t,nm,ttPdfBody(),true);return}
   if(t.dataset.word){const src=document.getElementById(t.dataset.word);if(src){wordNext=true;src.disabled=false;src.click();setTimeout(()=>{wordNext=false},0)}return}
+  if(t.id==='comPrev'||t.id==='comNext'){const i=S.roster.findIndex(s=>s.id===comStud)+(t.id==='comNext'?1:-1);if(S.roster[i]){comStud=S.roster[i].id;comEdit=null;comDraft=null;render()}return}
+  if(t.id==='comSave'){const r=comRead();S.com=S.com||{};const L=S.com[comStud]=(S.com[comStud]||[]).slice();const rec={id:r.id||('c'+Date.now().toString(36)),d:r.d,k:r.k,b:r.b,l:r.l,t:r.t,w:r.w,n:r.n,p:r.p};const i=L.findIndex(x=>x.id===rec.id);if(i>=0)L[i]=rec;else L.push(rec);S.com[comStud]=L;saveCom();if(mode==='local'&&ghReady()){clearTimeout(ghTimer);ghPush()}comEdit=rec.id;comDraft=null;render();toast('💾 حُفظ التواصل مع ولي الأمر');return}
+  if(t.id==='comNew'){comEdit=null;comDraft=null;render();return}
+  if(t.dataset.come){comEdit=t.dataset.come;comDraft=null;render();window.scrollTo({top:0,behavior:'smooth'});return}
+  if(t.dataset.comdel){if(t.dataset.arm!=='1'){t.dataset.arm='1';t.textContent='تأكيد الحذف';return}S.com[comStud]=(S.com[comStud]||[]).filter(x=>x.id!==t.dataset.comdel);saveCom();if(comEdit===t.dataset.comdel){comEdit=null;comDraft=null}render();toast('حُذف التواصل');return}
+  if(t.id==='comPdf'){const st=S.roster.find(s=>s.id===comStud),r=comRead();sheetPDF(t,'نموذج التواصل مع ولي الأمر - '+st.name,comForm(st,r),false);return}
+  if(t.id==='comAll'){comRead();const bodies=S.roster.map(st=>{const L=comList(st.id);return comForm(st,L[0]||comAuto(st.id))});const nm='نماذج التواصل مع أولياء الأمور - '+clsName();if(wordNext){wordNext=false;sheetDOC(t,nm,bodies,false)}else sheetPDFMulti(t,nm,bodies);return}
   if(t.dataset.wkm){wkMonth=t.dataset.wkm;render();return}
   if(t.dataset.wk!=null&&t.classList.contains('wkb')){wkCell(t);return}
   if(t.dataset.wkcol!=null){const j=+t.dataset.wkcol,mk=wkMonthKey(),D=wkGet(wkSubj,mk);if(!D.d){D.d=wkDefDate(attMonths().find(x=>x.key===mk))}let n=0;S.roster.forEach(st=>{const r=(D.v[st.id]||[null,null,null]).slice();if(r[j]==null){r[j]=1;n++;D.v[st.id]=r}});saveWrk();render();toast(n?'✓ وُضع «منتظم» لـ '+n+' طالبًا في '+WK[j]:'كل الطلاب متابَعون في هذا العمود');return}
@@ -2305,7 +2390,7 @@ document.addEventListener('click',e=>{
   }
 });
 document.addEventListener('change',e=>{
-  {const t=e.target;if(t.id==='anSel'){anSubj=t.value;render();return}if(t.id==='wkSel'){wkSubj=t.value;render();return}if(t.id==='wkDate'){const D=wkGet(wkSubj,wkMonthKey());D.d=t.value;saveWrk();render();return}if(t.id==='anB'){S.info.anb=t.value;saveInfo();render();return}if(t.id==='anHi'||t.id==='anLo'){const h=+$('#anHi').value,l=+$('#anLo').value;if(h>l&&l>=0&&h<=100){S.info.cat=[h,l];saveInfo();render()}else toast('حد المتفوق يجب أن يكون أكبر من حد المتوسط');return}if(t.id==='anMax'){const n=+normDigits(t.value);if(n>0){S.diag=S.diag||{};const d=S.diag[anSubj]=S.diag[anSubj]||{v:{}};d.max=n;saveDiag();render()}return}if(t.dataset&&t.dataset.dg){if(anSetDiag(t.dataset.dg,t.value)!==false)anRerender();return}if(t.id==='meSel'){meT=t.value;try{localStorage.setItem('grades-me',meT)}catch(x){}const tt=curTeacher();if(tt&&(tt.cls||[]).length&&!(tt.cls||[]).includes(curCls))openClass(tt.cls[0]);else render();return}if(t.id==='stSel'){stSel=t.value;render();return}if(t.id==='stCls'){stCls=t.value;render();return}}
+  {const t=e.target;if(t.id==='anSel'){anSubj=t.value;render();return}if(/^com[DBLTNP]$|^comW\d$/.test(t.id)){comRead();return}if(t.id==='comSt'){comRead();comStud=t.value;comEdit=null;comDraft=null;render();return}if(t.id==='wkSel'){wkSubj=t.value;render();return}if(t.id==='wkDate'){const D=wkGet(wkSubj,wkMonthKey());D.d=t.value;saveWrk();render();return}if(t.id==='anB'){S.info.anb=t.value;saveInfo();render();return}if(t.id==='anHi'||t.id==='anLo'){const h=+$('#anHi').value,l=+$('#anLo').value;if(h>l&&l>=0&&h<=100){S.info.cat=[h,l];saveInfo();render()}else toast('حد المتفوق يجب أن يكون أكبر من حد المتوسط');return}if(t.id==='anMax'){const n=+normDigits(t.value);if(n>0){S.diag=S.diag||{};const d=S.diag[anSubj]=S.diag[anSubj]||{v:{}};d.max=n;saveDiag();render()}return}if(t.dataset&&t.dataset.dg){if(anSetDiag(t.dataset.dg,t.value)!==false)anRerender();return}if(t.id==='meSel'){meT=t.value;try{localStorage.setItem('grades-me',meT)}catch(x){}const tt=curTeacher();if(tt&&(tt.cls||[]).length&&!(tt.cls||[]).includes(curCls))openClass(tt.cls[0]);else render();return}if(t.id==='stSel'){stSel=t.value;render();return}if(t.id==='stCls'){stCls=t.value;render();return}}
   const t=e.target;
   if(t.type==='checkbox'&&t.closest&&t.closest('.nsel')){noteMselChanged(t.closest('.nsel'));return}
   if(t.id==='clsSel'){openClass(t.value);return}
@@ -2316,6 +2401,7 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('input',e=>{
   const t=e.target;
+  if(t.id==='comN'||t.id==='comP'){comRead();return}
   if(t.id==='stQ'){stQ=t.value;const q=arNorm(stQ);document.querySelectorAll('table.stt tbody tr').forEach(tr=>{tr.hidden=q&&!arNorm(tr.textContent).includes(q)});return}
   if(t.id==='eSearch'){const q=t.value.trim();document.querySelectorAll('table.eg tbody tr').forEach(tr=>{tr.hidden=q&&!tr.children[1].textContent.includes(q)});const tw=document.querySelector('#egWrap');if(tw&&tw._fzb)tw._fzb()}
   if(t.dataset&&t.dataset.f){const tr=t.closest('tr'),st=S.roster.find(s=>s.id===tr.dataset.sid);if(st){st[t.dataset.f]=t.dataset.f==='pid'?normDigits(t.value):t.value;saveRoster();renderHeader()}}
