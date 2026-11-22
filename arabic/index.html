@@ -805,6 +805,13 @@ async function assignSubject(k,uid,quiet){
 const GHK='grades-ar-gh';
 let gh=(()=>{try{return JSON.parse(localStorage.getItem(GHK))||(AR_ONLY&&JSON.parse(localStorage.getItem('grades-gh')))||{}}catch(e){return{}}})();
 const GH_FILE=AR_ONLY?'arabic.json':'data.json';
+/* permanent sign-in link: #k=<base64url {o,r,t}> restores the GitHub link if the browser lost its storage */
+const b64u=x=>btoa(unescape(encodeURIComponent(x))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const ub64u=x=>decodeURIComponent(escape(atob(x.replace(/-/g,'+').replace(/_/g,'/'))));
+let ghFromLink=false;
+try{const m=location.hash.match(/[#&]k=([\w-]+)/);if(m){const o=JSON.parse(ub64u(m[1]));if(o&&o.t){ghFromLink=!gh.token||gh.token!==o.t;gh=Object.assign({},gh,{owner:o.o||gh.owner||'khaledalhamri93-stack',repo:o.r||gh.repo||'Grades-data',path:GH_FILE,token:o.t});localStorage.setItem(GHK,JSON.stringify(gh))}}}catch(e){}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+const ghPermLink=()=>location.origin+location.pathname+'#k='+b64u(JSON.stringify({o:gh.owner,r:gh.repo,t:gh.token}));
 let ghSha=null,ghBusy=false,ghTimer=0,ghDirty=new Set(),ghLast='',ghErr='';
 const ghReady=()=>!!(gh.owner&&gh.repo&&gh.token);
 gh.path=GH_FILE;delete gh.branch;
@@ -869,9 +876,10 @@ function ghCard(){
     <button class="btn" id="ghSave" type="button">🔗 حفظ الربط واختباره</button>
     <button class="btn w" id="ghPullB" type="button" ${ghReady()?'':'disabled'}>⬇ تحميل من GitHub</button>
     <button class="btn w" id="ghPushB" type="button" ${ghReady()?'':'disabled'}>⬆ رفع الكل الآن</button>
-    ${gh.token?'<button class="btn r sm" id="ghForget" type="button">نسيان المفتاح</button>':''}
+    ${gh.token?'<button class="btn ok" id="ghLink" type="button">🔑 رابط دخول دائم</button><button class="btn r sm" id="ghForget" type="button">نسيان المفتاح</button>':''}
     <span class="msg${ghErr?' err':''}" id="ghMsg">${esc(ghErr||ghLast||(ghReady()?'مربوط':'غير مربوط'))}</span></div>
-  <div class="hint">يُحفظ المفتاح على هذا الجهاز فقط ولا يُرفع إلى أي مكان. كل جهاز (أو معلم) يدخل المفتاح مرة واحدة. أي تعديل يُرفع تلقائيًا بعد ثوانٍ، والصفحة تجلب تحديثات الآخرين كل دقيقة.</div>`;
+  <div class="hint">يُحفظ المفتاح على هذا الجهاز فقط ولا يُرفع إلى أي مكان. كل جهاز (أو معلم) يدخل المفتاح مرة واحدة. أي تعديل يُرفع تلقائيًا بعد ثوانٍ، والصفحة تجلب تحديثات الآخرين كل دقيقة.</div>
+  <div id="ghLinkBox" hidden style="margin-top:8px"><input type="text" id="ghLinkTxt" dir="ltr" readonly style="width:100%;font-size:12px" onclick="this.select()"><div class="hint">🔑 <b>رابط الدخول الدائم:</b> افتح المنصة من هذا الرابط دائمًا (احفظه في المفضلة أو أضفه إلى الشاشة الرئيسية من هذا الرابط)، فيعود الربط تلقائيًا حتى لو مُسحت ذاكرة المتصفح. الرابط فيه المفتاح — أرسله لكل معلم <b>في رسالة خاصة</b> فقط، ولا تنشره في مجموعة.</div></div>`;
 }
 async function ghClick(id){
   if(id==='ghSave'){
@@ -891,6 +899,7 @@ async function ghClick(id){
     return true}
   if(id==='ghPullB'){ghSha=null;ghDirty.clear();const ch=await ghPull();openClass(curCls);toast(ch?'⬇ حُمّلت آخر نسخة من GitHub':'لا توجد تغييرات جديدة');return true}
   if(id==='ghPushB'){CLASSES.forEach(c=>{if(localStorage.getItem(LKEY+'-'+c.id))ghDirty.add(c.id)});ghDirty.add('g');const ok=await ghPush();if(ok)toast('⬆ رُفعت كل البيانات');return true}
+  if(id==='ghLink'){const u=ghPermLink();$('#ghLinkBox').hidden=false;$('#ghLinkTxt').value=u;try{await navigator.clipboard.writeText(u);toast('🔑 نُسخ رابط الدخول الدائم')}catch(e){$('#ghLinkTxt').select();toast('انسخ الرابط من الخانة')}return true}
   if(id==='ghForget'){gh.token='';try{localStorage.setItem(GHK,JSON.stringify(gh))}catch(e){}render();toast('نُسي المفتاح على هذا الجهاز');return true}
   return false;
 }
@@ -2460,6 +2469,7 @@ document.addEventListener('drop',e=>{const sd=e.target.closest&&e.target.closest
     else{$('#gateMsg').textContent='كلمة المرور غير صحيحة';$('#gatePw').value='';$('#gatePw').focus()}});
 })();
 boot();
+if(ghFromLink)setTimeout(()=>toast('🔗 رُبط هذا الجهاز تلقائيًا من رابط الدخول الدائم'),1200);
 })();
 </script>
 
